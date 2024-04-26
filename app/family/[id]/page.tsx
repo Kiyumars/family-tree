@@ -1,6 +1,7 @@
 import { fetchFamilyTree } from "@/app/actions"
 import { createClient, getSSRUser } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
+import Members from "../components/Members"
 
 export default async function TreePage({ params }: { params: { id: number } }) {
   const user = await getSSRUser()
@@ -28,11 +29,7 @@ export default async function TreePage({ params }: { params: { id: number } }) {
 
   return (
     <div>
-      <ul>
-        {familyMembers.map((member) => {
-          return <li key={member.uuid}>{JSON.stringify(member)}</li>
-        })}
-      </ul>
+      <Members familyMembers={familyMembers} />
     </div>
   )
 }
