@@ -16,3 +16,7 @@ export async function fetchFamilyTree(
   const [{ data: familyMembers }, { data: familyRelationships }] = await Promise.all([fetchMembers, fetchRelationships])
   return { familyMembers, familyRelationships }
 }
+// TODO write real test
+export function createFamilyTree() {
+    return 'testing'
+}
