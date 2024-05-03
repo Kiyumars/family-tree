@@ -9,16 +9,14 @@ export default async function TreePage({ params }: { params: { id: number } }) {
     redirect("/")
   }
   const client = createClient()
-  const { familyMembers, familyRelationships } = await fetchFamilyTree(
+  const { familyMembers: nodes, familyRelationships: edges } = await fetchFamilyTree(
     client,
     params.id
   )
 
   if (
-    !familyMembers ||
-    !familyMembers.length ||
-    !familyRelationships ||
-    !familyRelationships?.length
+    !nodes ||
+    !nodes.length || edges === undefined
   ) {
     return (
       <div>
@@ -29,7 +27,7 @@ export default async function TreePage({ params }: { params: { id: number } }) {
 
   return (
     <div>
-      <Members familyMembers={familyMembers} />
+      <Members nodes={nodes} edges={edges} />
     </div>
   )
 }
