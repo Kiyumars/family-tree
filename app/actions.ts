@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js"
-import { Edge, FamilyMember, Node } from "./family/components/Members"
+import { notFound } from "next/navigation"
 
 export interface MemberRecord {
   id: number
@@ -17,10 +17,7 @@ export interface RelationshipRecord {
   }
 }
 
-export async function fetchFamilyTree(
-  client: SupabaseClient,
-  familyId: number
-) {
+export async function fetchTreeData(client: SupabaseClient, familyId: number) {
   const fetchMembers = client
     .from("family_members")
     .select(
@@ -44,85 +41,30 @@ export async function fetchFamilyTree(
     )
     .eq("family_id", familyId)
 
-  const [{ data: fmd }, { data: frb }] = await Promise.all([
+  const [membersRes, relationshipsRes] = await Promise.all([
     fetchMembers,
     fetchRelationships,
   ])
-
-  // todo handle errors and new families
-  if (!fmd || fmd.length < 1) {
-    return { familyMembers: [], familyRelationships: [] }
+  if (membersRes.error) {
+    throw new Error(membersRes.error.message)
+  }
+  if (relationshipsRes.error) {
+    throw new Error(relationshipsRes.error.message)
+  }
+  if (!membersRes.data?.length) {
+    const familyExists = await checkFamily(client, familyId)
+    if (!familyExists) {
+      notFound()
+    }
   }
 
-  const familyMembers = addLevels(fmd, frb as unknown as RelationshipRecord[])
-
-  const familyRelationships: Edge[] = frb?.map((fr) => {
-    return {
-      from: fr.source as number,
-      to: fr.target as number,
-    }
-  })
-  return { familyMembers, familyRelationships }
+  return { membersRes, relationshipsRes }
 }
 
-export function addLevels(
-  nodes: MemberRecord[],
-  edges: RelationshipRecord[]
-): Node[] {
-  const hash: Record<
-    number,
-    {
-      parents: number[]
-      children: number[]
-      partners: number[]
-      level?: number
-    }
-  > = {}
-  for (let i = 0; i < nodes.length; i++) {
-    hash[nodes[i].id] = { parents: [], children: [], partners: [] }
-  }
-  console.log("🚀 ~ hash 1:", hash)
-  for (let i = 0; i < edges.length; i++) {
-    const { source, target, relationship_types } = edges[i]
-    if (relationship_types.type == "parent") {
-      hash[source].children.push(target)
-    }
-    if (relationship_types.type == "child") {
-      hash[source].parents.push(target)
-    }
-    if (relationship_types.type == "partner") {
-      hash[source].partners.push(target)
-    }
-  }
-
-  let stack: [number, number][] = []
-  function bfs(id: number, level: number) {
-    if (hash[id].level != undefined) {
-      return
-    }
-    hash[id].level = level
-    hash[id].children.forEach((child) => stack.push([child, level + 1]))
-    hash[id].parents.forEach((parent) => stack.push([parent, level - 1]))
-    hash[id].partners.forEach((partner) => stack.push([partner, level]))
-  }
-
-  // start with oldest member of family tree
-  stack.push([nodes[0].id, 0])
-  while (stack && stack.length > 0) {
-    for (let i = 0; i < stack.length; i++) {
-      const pop = stack.shift()
-      if (pop) {
-        bfs(pop[0], pop[1])
-      }
-    }
-  }
-
-  return nodes.map((node) => {
-    return {
-      id: node.id,
-      label: `${node.first_name} ${node.second_name}`,
-      title: `${node.first_name} ${node.second_name}`,
-      level: hash[node.id].level != undefined ? hash[node.id].level : 0,
-    }
-  })
+export async function checkFamily(
+  client: SupabaseClient,
+  id: number
+): Promise<boolean> {
+  const res = await client.from("families").select().eq("id", id)
+  return res.data != null && res.data.length > 0
 }

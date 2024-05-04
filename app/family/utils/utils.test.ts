@@ -1,10 +1,7 @@
 import { describe } from "node:test"
 import { expect, test } from "vitest"
-import {
-  addLevels,
-  MemberRecord,
-  RelationshipRecord
-} from "./actions"
+import { addHierarchies } from "./utils"
+import { MemberRecord, RelationshipRecord } from "../../actions"
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {
@@ -12,7 +9,7 @@ describe("actions add level", () => {
       { id: 1, uuid: "sdfsdfs", first_name: "Grand", second_name: "Parent" },
     ]
     const edges: RelationshipRecord[] = []
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
   })
   test("should return zero for two standalone line", () => {
@@ -21,7 +18,7 @@ describe("actions add level", () => {
       { id: 2, uuid: "cxzxczx", first_name: "Grand", second_name: "Mother" },
     ]
     const edges: RelationshipRecord[] = []
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
     expect(res[1].level).toEqual(0)
   })
@@ -42,7 +39,7 @@ describe("actions add level", () => {
         relationship_types: { type: "partner", subtype: "married" },
       },
     ]
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
     expect(res[1].level).toEqual(0)
   })
@@ -63,7 +60,7 @@ describe("actions add level", () => {
         relationship_types: { type: "child", subtype: "biological" },
       },
     ]
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
     expect(res[1].level).toEqual(1)
   })
@@ -95,7 +92,7 @@ describe("actions add level", () => {
         relationship_types: { type: "child", subtype: "biological" },
       },
     ]
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
     expect(res[1].level).toEqual(0)
     expect(res[2].level).toEqual(1)
@@ -105,8 +102,12 @@ describe("actions add level", () => {
       { id: 1, uuid: "sdfsdfs", first_name: "Father", second_name: "Father" },
       { id: 2, uuid: "cxzxczx", first_name: "Mother", second_name: "Mother" },
       { id: 3, uuid: "vvvvvcc", first_name: "Child", second_name: "Child" },
-      { id: 4, uuid: "fsdffdsf", first_name: "Partner", second_name: "Of Child" },
-
+      {
+        id: 4,
+        uuid: "fsdffdsf",
+        first_name: "Partner",
+        second_name: "Of Child",
+      },
     ]
     const edges: RelationshipRecord[] = [
       {
@@ -140,7 +141,7 @@ describe("actions add level", () => {
         relationship_types: { type: "partner", subtype: "married" },
       },
     ]
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
     expect(res[1].level).toEqual(0)
     expect(res[2].level).toEqual(1)
@@ -151,10 +152,18 @@ describe("actions add level", () => {
       { id: 1, uuid: "sdfsdfs", first_name: "Father", second_name: "Father" },
       { id: 2, uuid: "cxzxczx", first_name: "Mother", second_name: "Mother" },
       { id: 3, uuid: "vvvvvcc", first_name: "Child", second_name: "Child" },
-      { id: 4, uuid: "fsdffdsf", first_name: "Partner", second_name: "Of Child" },
-      { id: 5, uuid: "gggsdfdsd", first_name: "Child", second_name: "Of Child" },
-
-
+      {
+        id: 4,
+        uuid: "fsdffdsf",
+        first_name: "Partner",
+        second_name: "Of Child",
+      },
+      {
+        id: 5,
+        uuid: "gggsdfdsd",
+        first_name: "Child",
+        second_name: "Of Child",
+      },
     ]
     const edges: RelationshipRecord[] = [
       {
@@ -208,7 +217,7 @@ describe("actions add level", () => {
         relationship_types: { type: "child", subtype: "biological" },
       },
     ]
-    const res = addLevels(members, edges)
+    const res = addHierarchies(members, edges)
     expect(res[0].level).toEqual(0)
     expect(res[1].level).toEqual(0)
     expect(res[2].level).toEqual(1)
