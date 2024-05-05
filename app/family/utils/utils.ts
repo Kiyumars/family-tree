@@ -69,9 +69,18 @@ export function addHierarchies(
       return
     }
     hash[id].level = level
-    hash[id].children.forEach((child) => stack.push([child, level + 1]))
-    hash[id].parents.forEach((parent) => stack.push([parent, level - 1]))
-    hash[id].partners.forEach((partner) => stack.push([partner, level]))
+    hash[id].children.forEach(
+      (child) =>
+        hash[child].level === undefined && stack.push([child, level + 1])
+    )
+    hash[id].parents.forEach(
+      (parent) =>
+        hash[parent].level === undefined && stack.push([parent, level - 1])
+    )
+    hash[id].partners.forEach(
+      (partner) =>
+        hash[partner].level === undefined && stack.push([partner, level])
+    )
   }
 
   // start with oldest member of family tree
