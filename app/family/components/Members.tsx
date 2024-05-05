@@ -1,12 +1,7 @@
 "use client"
 
 import * as React from "react"
-import VisGraph, {
-  GraphData,
-  GraphEvents,
-  Options,
-  Network,
-} from "react-vis-graph-wrapper"
+import VisGraph from "react-vis-graph-wrapper"
 
 interface Props {
   nodes: Node[]
@@ -33,30 +28,27 @@ export interface Edge {
 }
 
 export function Members({ nodes, edges }: Props) {
-  const options: Options = {
-    layout: {
-      hierarchical: {
-        direction: "UD",
-        sortMethod: "directed",
-      },
-    },
-    edges: {
-      color: "#000000",
-    },
-    height: "500px",
-  }
-
-  const events: GraphEvents = {
-    select: (event: any) => {
-      const { nodes, edges } = event
-      console.log(nodes, edges)
-    },
-  }
   return (
     <VisGraph
       graph={{ nodes, edges }}
-      options={options}
-      events={events}
+      options={{
+        layout: {
+          hierarchical: {
+            direction: "UD",
+            sortMethod: "directed",
+          },
+        },
+        edges: {
+          color: "#000000",
+        },
+        height: "500px",
+      }}
+      events={{
+        select: (event: any) => {
+          const { nodes, edges } = event
+          console.log(nodes, edges)
+        },
+      }}
       // ref={(network: Network) => {
       //   //  if you want access to vis.js network api you can set the state in a parent component using this property
       //   console.log(network)
