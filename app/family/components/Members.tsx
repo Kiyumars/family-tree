@@ -36,11 +36,10 @@ export interface Relationship {
   relationship_types: RelationshipType
 }
 
-export interface Node {
-  id: number
+export type Node = FamilyMember & {
   label: string
   title: string
-  level?: number
+  level: number
 }
 
 export function Members({ members, relationships }: Props) {
