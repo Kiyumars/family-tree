@@ -1,8 +1,7 @@
-import { checkFamily, fetchTreeData } from "../../actions"
 import { createClient, getSSRUser } from "@/utils/supabase/server"
-import { normalizeTree } from "../utils/utils"
 import { redirect } from "next/navigation"
-import Members from "../components/Members"
+import { fetchTreeData } from "../../actions"
+import Members, { Relationship } from "../components/Members"
 
 export default async function TreePage({ params }: { params: { id: number } }) {
   const user = await getSSRUser()
@@ -23,11 +22,12 @@ export default async function TreePage({ params }: { params: { id: number } }) {
     )
   }
 
-  const { nodes, edges } = normalizeTree(membersRes.data, relationshipsRes.data)
-
   return (
     <div>
-      <Members nodes={nodes} edges={edges} />
+      <Members
+        members={membersRes.data}
+        relationships={relationshipsRes.data as unknown as Relationship[]}
+      />
     </div>
   )
 }

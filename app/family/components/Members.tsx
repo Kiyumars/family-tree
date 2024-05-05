@@ -5,16 +5,35 @@ import VisGraph, { Network } from "react-vis-graph-wrapper"
 import MemberModal from "./MemberModal"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
+import { setHierarchies } from "../utils/utils"
 
 interface Props {
-  nodes: Node[]
-  edges: Edge[]
+  members: FamilyMember[]
+  relationships: Relationship[]
 }
 
 export interface FamilyMember {
+  id: number
   uuid: string
+  family_id: number
   first_name: string
   second_name: string
+  birth_date: string
+  gender?: string
+  biography?: string
+  profession?: string
+  death_date?: Date
+}
+
+export interface RelationshipType {
+  type: string
+  subtype: string
+}
+
+export interface Relationship {
+  source: number
+  target: number
+  relationship_types: RelationshipType
 }
 
 export interface Node {
@@ -24,14 +43,25 @@ export interface Node {
   level?: number
 }
 
-export interface Edge {
-  from: number
-  to: number
-  label: string
-}
-
-export function Members({ nodes, edges }: Props) {
+export function Members({ members, relationships }: Props) {
+  const hierarchies = setHierarchies(members, relationships)
+  const nodes = members.map((member) => {
+    return {
+      title: `${member.first_name} ${member.second_name}`,
+      label: `${member.first_name} ${member.second_name}`,
+      level: hierarchies[member.id],
+      ...member,
+    }
+  })
   const nodeSet = new DataSet(nodes)
+
+  const edges = relationships.map((r) => {
+    return {
+      from: r.source,
+      to: r.target,
+      // label: r.relationship_types.type,
+    }
+  })
   const [selected, setSelected] = React.useState<
     FullItem<Node, "id"> | undefined
   >(undefined)
@@ -58,7 +88,9 @@ export function Members({ nodes, edges }: Props) {
         events={{
           select: (event: any) => {
             if (event.nodes.length === 1) {
-              const selectedNode = nodeSet.get(event.nodes[0]) as unknown as FullItem<Node, 'id'>
+              const selectedNode = nodeSet.get(
+                event.nodes[0]
+              ) as unknown as FullItem<Node, "id">
               if (selectedNode) {
                 setSelected(selectedNode)
               }

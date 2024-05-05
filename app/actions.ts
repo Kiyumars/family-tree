@@ -1,22 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js"
 import { notFound } from "next/navigation"
 
-export interface MemberRecord {
-  id: number
-  uuid: string
-  first_name: string
-  second_name: string
-}
-
-export interface RelationshipRecord {
-  source: number
-  target: number
-  relationship_types: {
-    type: string
-    subtype: string
-  }
-}
-
 export async function fetchTreeData(client: SupabaseClient, familyId: number) {
   const fetchMembers = client
     .from("family_members")
@@ -24,8 +8,14 @@ export async function fetchTreeData(client: SupabaseClient, familyId: number) {
       `
     id,
     uuid,
+    family_id,
     first_name,
-    second_name
+    second_name,
+    birth_date,
+    gender,
+    biography,
+    profession,
+    death_date
     `
     )
     .eq("family_id", familyId)

@@ -1,52 +1,20 @@
-import { MemberRecord, RelationshipRecord } from "@/app/actions"
-import { Edge, Node } from "../components/Members"
+import { FamilyMember, Relationship } from "../components/Members"
 
-export function normalizeTree(
-  members: {
-    id: any
-    uuid: any
-    first_name: any
-    second_name: any
-  }[],
-  relationships: {
-    source: any
-    target: any
-    relationship_types: {
-      type: any
-      subtype: any
-    }[]
-  }[]
-) {
-  const familyMembers = addHierarchies(
-    members,
-    relationships as unknown as RelationshipRecord[]
-  )
+type Hash = Record<
+  number,
+  {
+    parents: number[]
+    children: number[]
+    partners: number[]
+    level?: number
+  }
+>
 
-  const familyRelationships: Edge[] = relationships?.map((fr) => {
-    return {
-      from: fr.source as number,
-      to: fr.target as number,
-      // todo fix ts type error
-      // label: fr.relationship_types.type
-      label: "",
-    }
-  })
-  return { nodes: familyMembers, edges: familyRelationships }
-}
-
-export function addHierarchies(
-  nodes: MemberRecord[],
-  edges: RelationshipRecord[]
-): Node[] {
-  const hash: Record<
-    number,
-    {
-      parents: number[]
-      children: number[]
-      partners: number[]
-      level?: number
-    }
-  > = {}
+export function setHierarchies(
+  nodes: FamilyMember[],
+  edges: Relationship[]
+): Record<number, number> {
+  const hash: Hash = {}
   for (let i = 0; i < nodes.length; i++) {
     hash[nodes[i].id] = { parents: [], children: [], partners: [] }
   }
@@ -94,12 +62,15 @@ export function addHierarchies(
     }
   }
 
-  return nodes.map((node) => {
-    return {
-      id: node.id,
-      label: `${node.first_name} ${node.second_name}`,
-      title: `${node.first_name} ${node.second_name}`,
-      level: hash[node.id].level != undefined ? hash[node.id].level : 0,
+  const hierarchies: Record<number, number> = {}
+  for (let i = 0; i < nodes.length; i++) {
+    const id = nodes[i].id
+    if (hash[id] != undefined && hash[id].level != undefined) {
+      hierarchies[id] = hash[id].level
+    } else {
+      hierarchies[id] = 0
     }
-  })
+  }
+
+  return hierarchies
 }
