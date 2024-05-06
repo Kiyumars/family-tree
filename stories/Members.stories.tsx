@@ -1,5 +1,6 @@
-import Member, { FamilyMember } from "@/app/family/components/Members"
+import Member from "@/app/family/components/Members"
 import { Meta, StoryObj } from "@storybook/react"
+import { createMembers } from "./util"
 
 const meta: Meta<typeof Member> = {
   component: Member,
@@ -7,26 +8,6 @@ const meta: Meta<typeof Member> = {
 
 export default meta
 type Story = StoryObj<typeof Member>
-
-interface FakeMember {
-  first_name: string
-  second_name: string
-}
-
-function createMembers(members: FakeMember[]): FamilyMember[] {
-  let results: FamilyMember[] = []
-  for (let i = 1; i < members.length + 1; i++) {
-    results.push({
-      id: i,
-      uuid: (Math.random() + 1).toString(36).substring(7),
-      family_id: i,
-      birth_date: Date(),
-      first_name: members[i - 1].first_name,
-      second_name: members[i - 1].second_name,
-    })
-  }
-  return results
-}
 
 export const OneEntry: Story = {
   render: () => {

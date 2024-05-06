@@ -90,11 +90,11 @@ function EditMode({
         </div>
         <div>
           <label htmlFor="profession">Profession: </label>
-          <textarea name="profession" defaultValue={node.profession} />
+          <textarea name="profession" defaultValue={node.profession || ""} />
         </div>
         <div>
           <label htmlFor="biography">Biography: </label>
-          <textarea name="biography" defaultValue={node.biography} />
+          <textarea name="biography" defaultValue={node.biography || ""} />
         </div>
       </form>
       <button onClick={onClose}>Close</button>

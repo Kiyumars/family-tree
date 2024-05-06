@@ -1,23 +1,14 @@
 import { SupabaseClient } from "@supabase/supabase-js"
 import { notFound } from "next/navigation"
+import { Tables } from "@/database.types"
+import { createClient } from "@/utils/supabase/server"
 
-export async function fetchTreeData(client: SupabaseClient, familyId: number) {
+export async function fetchTreeData(familyId: number) {
+  const client = createClient()
   const fetchMembers = client
     .from("family_members")
-    .select(
-      `
-    id,
-    uuid,
-    family_id,
-    first_name,
-    second_name,
-    birth_date,
-    gender,
-    biography,
-    profession,
-    death_date
-    `
-    )
+    .select()
+
     .eq("family_id", familyId)
     .order("birth_date")
   const fetchRelationships = client

@@ -1,4 +1,5 @@
-import { FamilyMember, Relationship } from "../components/Members"
+import { Tables } from "@/database.types"
+import { Relationship, RelationshipType } from "../components/Members"
 
 type Hash = Record<
   number,
@@ -11,7 +12,7 @@ type Hash = Record<
 >
 
 export function setHierarchies(
-  nodes: FamilyMember[],
+  nodes: Tables<'family_members'>[],
   edges: Relationship[]
 ): Record<number, number> {
   const hash: Hash = {}

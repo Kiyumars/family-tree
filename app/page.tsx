@@ -1,6 +1,4 @@
-import DeployButton from "../components/DeployButton"
 import AuthButton from "../components/AuthButton"
-import { createClient } from "@/utils/supabase/server"
 
 export default async function Index() {
   return (

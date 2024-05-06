@@ -1,29 +1,12 @@
 "use client"
 
+import { Tables } from "@/database.types"
 import * as React from "react"
-import VisGraph, { Network } from "react-vis-graph-wrapper"
-import MemberModal from "./MemberModal"
+import VisGraph from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import { setHierarchies } from "../utils/utils"
-
-interface Props {
-  members: FamilyMember[]
-  relationships: Relationship[]
-}
-
-export interface FamilyMember {
-  id: number
-  uuid: string
-  family_id: number
-  first_name: string
-  second_name: string
-  birth_date: string
-  gender?: string
-  biography?: string
-  profession?: string
-  death_date?: Date
-}
+import MemberModal from "./MemberModal"
 
 export interface RelationshipType {
   type: string
@@ -36,7 +19,12 @@ export interface Relationship {
   relationship_types: RelationshipType
 }
 
-export type Node = FamilyMember & {
+interface Props {
+  members: Tables<"family_members">[]
+  relationships: Relationship[]
+}
+
+export type Node = Tables<"family_members"> & {
   label: string
   title: string
   level: number
