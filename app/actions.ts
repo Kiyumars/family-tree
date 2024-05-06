@@ -46,6 +46,6 @@ export async function checkFamily(
   client: SupabaseClient,
   id: number
 ): Promise<boolean> {
-  const res = await client.from("families").select().eq("id", id)
+  const res = await client.from("trees").select().eq("id", id)
   return res.data != null && res.data.length > 0
 }
