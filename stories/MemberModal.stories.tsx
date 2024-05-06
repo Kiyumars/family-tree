@@ -1,5 +1,5 @@
-import { FamilyMember, Node } from "@/app/family/components/Members"
 import MemberModal from "@/app/family/components/MemberModal"
+import { Node } from "@/app/family/components/Members"
 import { Meta, StoryObj } from "@storybook/react"
 import * as React from "react"
 
@@ -33,6 +33,23 @@ export const Read: Story = {
       <div id="modal-root">
         {display && (
           <MemberModal node={fakeMember} onClose={() => setDisplay(false)} />
+        )}
+      </div>
+    )
+  },
+}
+
+export const Edit: Story = {
+  render: () => {
+    const [display, setDisplay] = React.useState(true)
+    return (
+      <div id="modal-root">
+        {display && (
+          <MemberModal
+            isEdit={true}
+            node={fakeMember}
+            onClose={() => setDisplay(false)}
+          />
         )}
       </div>
     )
