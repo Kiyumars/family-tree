@@ -1,5 +1,5 @@
-import MemberModal from "@/app/family/components/MemberModal"
-import { Node } from "@/app/family/components/Members"
+import MemberModal from "@/app/tree/components/MemberModal"
+import { Node } from "@/app/tree/components/Members"
 import { Meta, StoryObj } from "@storybook/react"
 import * as React from "react"
 

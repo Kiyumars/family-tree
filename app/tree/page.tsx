@@ -8,8 +8,8 @@ export default async function Trees() {
     redirect("/")
   }
   const client = createClient()
-  const { data: families } = await client.from("families").select()
-  if (!families || !families.length) {
+  const { data: tree } = await client.from("trees").select()
+  if (!tree || !tree.length) {
     return (
       <div>
         <h1>There are no families in the database</h1>
@@ -18,12 +18,12 @@ export default async function Trees() {
   }
   return (
     <div>
-      <h1>Here are all the families</h1>
+      <h1>Here are all the family trees</h1>
       <ul>
-        {families.map((family) => {
+        {tree.map((tree) => {
           return (
             <li>
-              <Link href={`/family/${family.id}`}>{family.name}</Link>
+              <Link href={`/tree/${tree.id}`}>{tree.name}</Link>
             </li>
           )
         })}

@@ -1,4 +1,4 @@
-import Member from "@/app/family/components/Members"
+import Member from "@/app/tree/components/Members"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers } from "./util"
 
