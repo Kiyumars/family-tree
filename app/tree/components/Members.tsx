@@ -34,7 +34,6 @@ export function Members({ members, relationships }: Props) {
   const hierarchies = setHierarchies(members, relationships)
   const nodes = members.map((member) => {
     return {
-      title: `${member.first_name} ${member.second_name}`,
       label: `${member.first_name} ${member.second_name}`,
       level: hierarchies[member.id],
       ...member,
@@ -46,11 +45,10 @@ export function Members({ members, relationships }: Props) {
     return {
       from: r.source,
       to: r.target,
-      // label: r.relationship_types.type,
     }
   })
   const [selected, setSelected] = React.useState<
-    FullItem<Node, "id"> | undefined
+    Tables<'family_members'> | undefined
   >(undefined)
   return (
     <div>

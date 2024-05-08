@@ -6,13 +6,14 @@ import { Node } from "./Members"
 import { FullItem } from "vis-data/declarations/data-interface"
 import { editNode } from "@/app/actions"
 import styles from "./MemberModal.module.css"
+import { Tables } from "@/database.types"
 
 function ReadMode({
   node,
   onClose,
   onEditMode,
 }: {
-  node: FullItem<Node, "id">
+  node: Tables<"family_members">
   onClose: () => void
   onEditMode: () => void
 }) {
@@ -37,9 +38,11 @@ function ReadMode({
 function EditMode({
   node,
   onClose,
+  onSubmit,
 }: {
-  node: FullItem<Node, "id">
+  node: Tables<"family_members">
   onClose: () => void
+  onSubmit: (node: Tables<"family_members">) => void
 }) {
   return (
     <div>
@@ -54,8 +57,8 @@ function EditMode({
           if (!death) {
             formData.delete("death_date")
           }
-          const res = await editNode(formData)
-          onClose()
+          const editedNode = await editNode(formData)
+          onSubmit(editedNode)
         }}
       >
         <div>
@@ -133,20 +136,25 @@ export default function MemberModal({
   isEdit = false,
 }: {
   onClose: () => void
-  node: FullItem<Node, "id">
+  node: Tables<'family_members'>
   isEdit?: boolean
 }) {
   const [editMode, setEditMode] = React.useState(isEdit)
+  const [n, setNode] = React.useState(node)
   return (
     <ModalWrapper>
       {editMode ? (
         <EditMode
-          node={node}
+          node={n}
           onClose={onClose}
+          onSubmit={(editedNode) => {
+            setNode(editedNode)
+            setEditMode(false)
+          }}
         />
       ) : (
         <ReadMode
-          node={node}
+          node={n}
           onClose={onClose}
           onEditMode={() => setEditMode(true)}
         />

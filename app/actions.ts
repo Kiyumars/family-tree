@@ -3,6 +3,7 @@
 import { TablesInsert } from "@/database.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
+import { revalidatePath } from "next/cache"
 import { notFound } from "next/navigation"
 
 import { z } from "zod"
@@ -77,12 +78,10 @@ export async function editNode(fd: FormData) {
     gender: fd.get("gender"),
     profession: fd.get("profession"),
   })
-  if (node.success) {
-    const updated = await upsert(node.data)
-    return updated
-  } else {
+  if (!node.success) {
     throw node.error
   }
+  return await upsert(node.data)
 }
 
 async function upsert(node: TablesInsert<"family_members">) {
@@ -91,6 +90,9 @@ async function upsert(node: TablesInsert<"family_members">) {
     .from("family_members")
     .upsert(node)
     .select()
+    .limit(1)
+    .single()
   if (error != null) throw error
+  revalidatePath(`/tree/${node.family_id}`)
   return data
 }
