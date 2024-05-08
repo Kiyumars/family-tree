@@ -4,6 +4,7 @@ import * as React from "react"
 import ModalWrapper from "./ModalWrapper"
 import { Node } from "./Members"
 import { FullItem } from "vis-data/declarations/data-interface"
+import { editNode } from "@/app/actions"
 import styles from "./MemberModal.module.css"
 
 function ReadMode({
@@ -21,9 +22,11 @@ function ReadMode({
       <div>
         <p>First name: {node.first_name}</p>
         <p>Second name: {node.second_name}</p>
-        <p>Birth date: {node.birth_date}</p>
+        <p>Birth: {node.birth_date}</p>
+        <p>Death: {node.death_date}</p>
         <p>Gender: {node.gender}</p>
         <p>Profession: {node.profession}</p>
+        <p>Bio: {node.biography}</p>
       </div>
       <button onClick={onClose}>Close</button>
       <button onClick={onEditMode}>Edit</button>
@@ -41,7 +44,20 @@ function EditMode({
   return (
     <div>
       <h1 className={styles.title}>MemberModal</h1>
-      <form>
+      <form
+        action={async (formData) => {
+          if (node.id) {
+            formData.append("id", node.id.toString())
+          }
+          formData.append("family_id", node.family_id.toString())
+          const death = formData.get("death_date")
+          if (!death) {
+            formData.delete("death_date")
+          }
+          const res = await editNode(formData)
+          onClose()
+        }}
+      >
         <div>
           <label htmlFor="first_name">First name: </label>
           <input
@@ -67,6 +83,14 @@ function EditMode({
             name="birth_date"
             defaultValue={node.birth_date}
             required
+          />
+        </div>
+        <div>
+          <label htmlFor="death_date">Death Date: </label>
+          <input
+            type="date"
+            name="death_date"
+            defaultValue={node.death_date || undefined}
           />
         </div>
         <div>
@@ -96,6 +120,7 @@ function EditMode({
           <label htmlFor="biography">Biography: </label>
           <textarea name="biography" defaultValue={node.biography || ""} />
         </div>
+        <button type="submit">Submit</button>
       </form>
       <button onClick={onClose}>Close</button>
     </div>
@@ -115,7 +140,10 @@ export default function MemberModal({
   return (
     <ModalWrapper>
       {editMode ? (
-        <EditMode node={node} onClose={onClose} />
+        <EditMode
+          node={node}
+          onClose={onClose}
+        />
       ) : (
         <ReadMode
           node={node}
