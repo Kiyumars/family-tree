@@ -28,6 +28,7 @@ async function Content({ id }: { id: number }) {
   }
   return (
     <Members
+      familyId={id}
       members={membersRes.data}
       // ts does not understand that relationship_type can not be null
       relationships={relationshipsRes.data as unknown as Relationship[]}

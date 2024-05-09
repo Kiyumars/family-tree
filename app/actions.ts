@@ -13,13 +13,13 @@ export async function fetchTreeData(familyId: number) {
   const fetchMembers = client
     .from("family_members")
     .select()
-
     .eq("family_id", familyId)
     .order("birth_date")
   const fetchRelationships = client
     .from("family_member_relationships")
     .select(
       `
+   id,
    source,
    target,
    relationship_types (type, subtype)

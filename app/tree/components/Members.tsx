@@ -2,7 +2,7 @@
 
 import { Tables } from "@/database.types"
 import * as React from "react"
-import VisGraph from "react-vis-graph-wrapper"
+import VisGraph, { Edge } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import { setHierarchies } from "../utils/utils"
@@ -14,14 +14,21 @@ export interface RelationshipType {
 }
 
 export interface Relationship {
+  id: number
   source: number
   target: number
   relationship_types: RelationshipType
 }
 
 interface Props {
+  familyId: number
   members: Tables<"family_members">[]
   relationships: Relationship[]
+}
+
+interface SelectedProps {
+  node: Tables<"family_members">
+  relationships: Edge[]
 }
 
 export type Node = Tables<"family_members"> & {
@@ -30,7 +37,7 @@ export type Node = Tables<"family_members"> & {
   level: number
 }
 
-export function Members({ members, relationships }: Props) {
+export function Members({ members, relationships, familyId }: Props) {
   const hierarchies = setHierarchies(members, relationships)
   const nodes = members.map((member) => {
     return {
@@ -43,17 +50,26 @@ export function Members({ members, relationships }: Props) {
 
   const edges = relationships.map((r) => {
     return {
+      id: r.id,
       from: r.source,
       to: r.target,
+      type: r.relationship_types,
     }
   })
-  const [selected, setSelected] = React.useState<
-    Tables<'family_members'> | undefined
-  >(undefined)
+  const edgeSet = new DataSet(edges)
+
+  const [selected, setSelected] = React.useState<SelectedProps | undefined>(
+    undefined
+  )
   return (
     <div>
       {selected && (
-        <MemberModal node={selected} onClose={() => setSelected(undefined)} />
+        <MemberModal
+          familyId={familyId}
+          node={selected.node}
+          edges={selected.relationships}
+          onClose={() => setSelected(undefined)}
+        />
       )}
 
       <VisGraph
@@ -77,7 +93,11 @@ export function Members({ members, relationships }: Props) {
                 event.nodes[0]
               ) as unknown as FullItem<Node, "id">
               if (selectedNode) {
-                setSelected(selectedNode)
+                const connectedEdges = edgeSet.get(event.edges)
+                setSelected({
+                  node: selectedNode,
+                  relationships: connectedEdges,
+                })
               }
             }
           },
