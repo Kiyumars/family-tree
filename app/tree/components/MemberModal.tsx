@@ -192,6 +192,7 @@ export default function MemberModal({
   familyId: number
   node: Tables<"family_members">
   edges: Edge[]
+  getRelationship: (id: number) => Tables<'relationship_types'>
   mode?: Mode
 }) {
   const [modalMode, setModalMode] = React.useState(mode)

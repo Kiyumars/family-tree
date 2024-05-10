@@ -8,27 +8,16 @@ import { FullItem } from "vis-data/declarations/data-interface"
 import { setHierarchies } from "../utils/utils"
 import MemberModal from "./MemberModal"
 
-export interface RelationshipType {
-  type: string
-  subtype: string
-}
-
-export interface Relationship {
-  id: number
-  source: number
-  target: number
-  relationship_types: RelationshipType
-}
-
 interface Props {
   familyId: number
   members: Tables<"family_members">[]
-  relationships: Relationship[]
+  relationships: Tables<"family_member_relationships">[]
+  relationshipTypes: Tables<"relationship_types">[]
 }
 
 interface SelectedProps {
   node: Tables<"family_members">
-  relationships: Edge[]
+  relationships: Tables<"family_member_relationships">[]
 }
 
 export type Node = Tables<"family_members"> & {
@@ -37,8 +26,20 @@ export type Node = Tables<"family_members"> & {
   level: number
 }
 
-export function Members({ members, relationships, familyId }: Props) {
-  const hierarchies = setHierarchies(members, relationships)
+export function Members({
+  members,
+  relationships,
+  relationshipTypes,
+  familyId,
+}: Props) {
+  const rtMap: Record<number, Tables<"relationship_types">> = {}
+  relationshipTypes.forEach((rt) => {
+    rtMap[rt.id] = rt
+  })
+  const getRelationship = (id: number) => {
+    return rtMap[id]
+  }
+  const hierarchies = setHierarchies(members, relationships, getRelationship)
   const nodes = members.map((member) => {
     return {
       label: `${member.first_name} ${member.second_name}`,
@@ -47,16 +48,7 @@ export function Members({ members, relationships, familyId }: Props) {
     }
   })
   const nodeSet = new DataSet(nodes)
-
-  const edges = relationships.map((r) => {
-    return {
-      id: r.id,
-      from: r.source,
-      to: r.target,
-      type: r.relationship_types,
-    }
-  })
-  const edgeSet = new DataSet(edges)
+  const edgeSet = new DataSet(relationships)
 
   const [selected, setSelected] = React.useState<SelectedProps | undefined>(
     undefined
@@ -68,12 +60,13 @@ export function Members({ members, relationships, familyId }: Props) {
           familyId={familyId}
           node={selected.node}
           edges={selected.relationships}
+          getRelationship={getRelationship}
           onClose={() => setSelected(undefined)}
         />
       )}
 
       <VisGraph
-        graph={{ nodes, edges }}
+        graph={{ nodes, edges: relationships }}
         options={{
           layout: {
             hierarchical: {

@@ -17,25 +17,23 @@ export async function fetchTreeData(familyId: number) {
     .order("birth_date")
   const fetchRelationships = client
     .from("family_member_relationships")
-    .select(
-      `
-   id,
-   source,
-   target,
-   relationship_types (type, subtype)
-     `
-    )
+    .select()
     .eq("family_id", familyId)
+  const fetchRelationshipTypes = client.from('relationship_types').select()
 
-  const [membersRes, relationshipsRes] = await Promise.all([
+  const [membersRes, relationshipsRes, relationshipTypesRes] = await Promise.all([
     fetchMembers,
     fetchRelationships,
+    fetchRelationshipTypes
   ])
   if (membersRes.error) {
     throw new Error(membersRes.error.message)
   }
   if (relationshipsRes.error) {
     throw new Error(relationshipsRes.error.message)
+  }
+  if (relationshipTypesRes.error) {
+    throw new Error(relationshipTypesRes.error.message)
   }
   if (!membersRes.data?.length) {
     const familyExists = await checkFamily(client, familyId)
@@ -44,7 +42,7 @@ export async function fetchTreeData(familyId: number) {
     }
   }
 
-  return { membersRes, relationshipsRes }
+  return { membersRes, relationshipsRes, relationshipTypesRes }
 }
 
 export async function checkFamily(

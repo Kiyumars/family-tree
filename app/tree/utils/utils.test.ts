@@ -1,16 +1,29 @@
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { setHierarchies } from "./utils"
-import { Relationship } from "../components/Members"
 import { createMembers } from "../../../stories/util"
+import { Tables } from "@/database.types"
+
+
+function getRelationship(id: number)  {
+  const rtMap: Record<number, Tables<"relationship_types">> = {
+    1: { id: 1, type: "partner", subtype: "married" },
+    2: { id: 2, type: "partner", subtype: "unmarried" },
+    3: { id: 3, type: "child", subtype: "biological" },
+    4: { id: 4, type: "child", subtype: "adopted" },
+    5: { id: 5, type: "partner", subtype: "separated" },
+    6: { id: 6, type: "parent", subtype: "biological" },
+    7: { id: 7, type: "parent", subtype: "adopted" },
+  }
+  return rtMap[id]
+}
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {
     const members = createMembers([
       { first_name: "Grand", second_name: "Parent" },
     ])
-    const edges: Relationship[] = []
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, [], getRelationship )
     expect(hierarchies[members[0].id]).toEqual(0)
   })
   test("should return zero for two standalone line", () => {
@@ -18,8 +31,7 @@ describe("actions add level", () => {
       { first_name: "Grand", second_name: "Parent" },
       { first_name: "Grand", second_name: "Mother" },
     ])
-    const edges: Relationship[] = []
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, [], getRelationship)
     expect(hierarchies[members[0].id]).toEqual(0)
     expect(hierarchies[members[1].id]).toEqual(0)
   })
@@ -28,19 +40,23 @@ describe("actions add level", () => {
       { first_name: "Grand", second_name: "Parent" },
       { first_name: "Grand", second_name: "Mother" },
     ])
-    const edges: Relationship[] = [
+    const edges = [
       {
-        source: 1,
-        target: 2,
-        relationship_types: { type: "partner", subtype: "married" },
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 2,
+        relationship_type: 1,
       },
       {
-        source: 2,
-        target: 1,
-        relationship_types: { type: "partner", subtype: "married" },
+        id: 2,
+        family_id: 1,
+        from: 2,
+        to: 1,
+        relationship_type: 1,
       },
     ]
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, edges, getRelationship)
     expect(hierarchies[members[0].id]).toEqual(0)
     expect(hierarchies[members[1].id]).toEqual(0)
   })
@@ -49,19 +65,23 @@ describe("actions add level", () => {
       { first_name: "Father", second_name: "Parent" },
       { first_name: "Child", second_name: "Child" },
     ])
-    const edges: Relationship[] = [
+    const edges = [
       {
-        source: 1,
-        target: 2,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 2,
+        relationship_type: 6,
       },
       {
-        source: 2,
-        target: 1,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 2,
+        family_id: 1,
+        from: 2,
+        to: 1,
+        relationship_type: 3,
       },
     ]
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, edges, getRelationship)
     expect(hierarchies[members[0].id]).toEqual(0)
     expect(hierarchies[members[1].id]).toEqual(1)
   })
@@ -71,29 +91,37 @@ describe("actions add level", () => {
       { first_name: "Mother", second_name: "Parent" },
       { first_name: "Child", second_name: "Child" },
     ])
-    const edges: Relationship[] = [
+    const edges = [
       {
-        source: 1,
-        target: 3,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 3,
+        relationship_type: 6,
       },
       {
-        source: 2,
-        target: 3,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 2,
+        family_id: 1,
+        from: 2,
+        to: 3,
+        relationship_type: 6,
       },
       {
-        source: 3,
-        target: 1,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 3,
+        family_id: 1,
+        from: 3,
+        to: 1,
+        relationship_type: 3,
       },
       {
-        source: 3,
-        target: 2,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 4,
+        family_id: 1,
+        from: 3,
+        to: 2,
+        relationship_type: 3,
       },
     ]
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, edges, getRelationship)
     expect(hierarchies[members[0].id]).toEqual(0)
     expect(hierarchies[members[1].id]).toEqual(0)
     expect(hierarchies[members[2].id]).toEqual(1)
@@ -105,39 +133,51 @@ describe("actions add level", () => {
       { first_name: "Child", second_name: "Child" },
       { first_name: "Partner", second_name: "Partner" },
     ])
-    const edges: Relationship[] = [
+    const edges = [
       {
-        source: 1,
-        target: 3,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 3,
+        relationship_type: 6,
       },
       {
-        source: 2,
-        target: 3,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 2,
+        family_id: 1,
+        from: 2,
+        to: 3,
+        relationship_type:6,
       },
       {
-        source: 3,
-        target: 1,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 3,
+        family_id: 1,
+        from: 3,
+        to: 1,
+        relationship_type: 3,
       },
       {
-        source: 3,
-        target: 2,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 4,
+        family_id: 1,
+        from: 3,
+        to: 2,
+        relationship_type: 3,
       },
       {
-        source: 3,
-        target: 4,
-        relationship_types: { type: "partner", subtype: "married" },
+        id: 5,
+        family_id: 1,
+        from: 3,
+        to: 4,
+        relationship_type:1,
       },
       {
-        source: 4,
-        target: 3,
-        relationship_types: { type: "partner", subtype: "married" },
+        id: 6,
+        family_id: 1,
+        from: 4,
+        to: 3,
+        relationship_type:1,
       },
     ]
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, edges, getRelationship)
     expect(hierarchies[members[0].id]).toEqual(0)
     expect(hierarchies[members[1].id]).toEqual(0)
     expect(hierarchies[members[2].id]).toEqual(1)
@@ -151,59 +191,79 @@ describe("actions add level", () => {
       { first_name: "Partner", second_name: "Partner" },
       { first_name: "Child", second_name: "ofChild" },
     ])
-    const edges: Relationship[] = [
+    const edges = [
       {
-        source: 1,
-        target: 3,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 3,
+        relationship_type:6,
       },
       {
-        source: 2,
-        target: 3,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 2,
+        family_id: 1,
+        from: 2,
+        to: 3,
+        relationship_type: 6,
       },
       {
-        source: 3,
-        target: 1,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 3,
+        family_id: 1,
+        from: 3,
+        to: 1,
+        relationship_type: 3,
       },
       {
-        source: 3,
-        target: 2,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 4,
+        family_id: 1,
+        from: 3,
+        to: 2,
+        relationship_type: 3,
       },
       {
-        source: 3,
-        target: 4,
-        relationship_types: { type: "partner", subtype: "married" },
+        id: 5,
+        family_id: 1,
+        from: 3,
+        to: 4,
+        relationship_type:1,
       },
       {
-        source: 4,
-        target: 3,
-        relationship_types: { type: "partner", subtype: "married" },
+        id: 6,
+        family_id: 1,
+        from: 4,
+        to: 3,
+        relationship_type:1,
       },
       {
-        source: 3,
-        target: 5,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 7,
+        family_id: 1,
+        from: 3,
+        to: 5,
+        relationship_type: 6,
       },
       {
-        source: 4,
-        target: 5,
-        relationship_types: { type: "parent", subtype: "biological" },
+        id: 8,
+        family_id: 1,
+        from: 4,
+        to: 5,
+        relationship_type:6,
       },
       {
-        source: 5,
-        target: 3,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 9,
+        family_id: 1,
+        from: 5,
+        to: 3,
+        relationship_type: 3,
       },
       {
-        source: 5,
-        target: 4,
-        relationship_types: { type: "child", subtype: "biological" },
+        id: 10,
+        family_id: 1,
+        from: 5,
+        to: 4,
+        relationship_type: 3,
       },
     ]
-    const hierarchies = setHierarchies(members, edges)
+    const hierarchies = setHierarchies(members, edges, getRelationship)
     expect(hierarchies[members[0].id]).toEqual(0)
     expect(hierarchies[members[1].id]).toEqual(0)
     expect(hierarchies[members[2].id]).toEqual(1)

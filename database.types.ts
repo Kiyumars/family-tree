@@ -12,24 +12,24 @@ export type Database = {
       family_member_relationships: {
         Row: {
           family_id: number
+          from: number
           id: number
           relationship_type: number
-          source: number
-          target: number
+          to: number
         }
         Insert: {
           family_id: number
+          from: number
           id?: number
           relationship_type: number
-          source: number
-          target: number
+          to: number
         }
         Update: {
           family_id?: number
+          from?: number
           id?: number
           relationship_type?: number
-          source?: number
-          target?: number
+          to?: number
         }
         Relationships: [
           {
@@ -40,6 +40,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "family_member_relationships_from_fkey"
+            columns: ["from"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "family_member_relationships_relationship_type_fkey"
             columns: ["relationship_type"]
             isOneToOne: false
@@ -47,15 +54,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "family_member_relationships_source_fkey"
-            columns: ["source"]
-            isOneToOne: false
-            referencedRelation: "family_members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "family_member_relationships_target_fkey"
-            columns: ["target"]
+            foreignKeyName: "family_member_relationships_to_fkey"
+            columns: ["to"]
             isOneToOne: false
             referencedRelation: "family_members"
             referencedColumns: ["id"]

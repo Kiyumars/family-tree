@@ -1,5 +1,4 @@
 import { Tables } from "@/database.types"
-import { Relationship, RelationshipType } from "../components/Members"
 
 type Hash = Record<
   number,
@@ -12,23 +11,23 @@ type Hash = Record<
 >
 
 export function setHierarchies(
-  nodes: Tables<'family_members'>[],
-  edges: Relationship[]
+  nodes: Tables<"family_members">[],
+  edges: Tables<"family_member_relationships">[],
+  getRelationship: (id: number) => Tables<'relationship_types'>
 ): Record<number, number> {
   const hash: Hash = {}
   for (let i = 0; i < nodes.length; i++) {
     hash[nodes[i].id] = { parents: [], children: [], partners: [] }
   }
   for (let i = 0; i < edges.length; i++) {
-    const { source, target, relationship_types } = edges[i]
-    if (relationship_types.type == "parent") {
-      hash[source].children.push(target)
-    }
-    if (relationship_types.type == "child") {
-      hash[source].parents.push(target)
-    }
-    if (relationship_types.type == "partner") {
-      hash[source].partners.push(target)
+    const { from, to, relationship_type } = edges[i]
+    switch(getRelationship(relationship_type).type) {
+      case "parent":
+        hash[from].children.push(to)
+      case "child":
+        hash[from].parents.push(to)
+      case "partner":
+        hash[from].partners.push(to)
     }
   }
 

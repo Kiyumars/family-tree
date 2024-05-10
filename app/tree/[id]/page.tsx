@@ -1,7 +1,7 @@
 import { getSSRUser } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { fetchTreeData } from "../../actions"
-import Members, { Relationship } from "../components/Members"
+import Members from "../components/Members"
 import { Suspense } from "react"
 
 export default async function TreePage({ params }: { params: { id: number } }) {
@@ -17,7 +17,7 @@ export default async function TreePage({ params }: { params: { id: number } }) {
 }
 
 async function Content({ id }: { id: number }) {
-  const { membersRes, relationshipsRes } = await fetchTreeData(id)
+  const { membersRes, relationshipsRes, relationshipTypesRes } = await fetchTreeData(id)
 
   if (!membersRes.data?.length) {
     return (
@@ -31,7 +31,8 @@ async function Content({ id }: { id: number }) {
       familyId={id}
       members={membersRes.data}
       // ts does not understand that relationship_type can not be null
-      relationships={relationshipsRes.data as unknown as Relationship[]}
+      relationships={relationshipsRes.data}
+      relationshipTypes={relationshipTypesRes.data}
     />
   )
 }
