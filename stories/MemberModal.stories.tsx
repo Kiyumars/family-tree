@@ -2,7 +2,7 @@ import MemberModal, {
   EditMode,
   ReadMode,
 } from "@/app/tree/components/MemberModal"
-import { Node } from "@/app/tree/components/Members"
+import { Node } from "@/app/tree/components/MembersGraph"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
 import { Meta, StoryObj } from "@storybook/react"
 import * as React from "react"
