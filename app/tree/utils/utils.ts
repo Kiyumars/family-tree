@@ -65,8 +65,9 @@ export function setHierarchies(
   const hierarchies: Record<number, number> = {}
   for (let i = 0; i < nodes.length; i++) {
     const id = nodes[i].id
-    if (hash[id] != undefined && hash[id].level != undefined) {
-      hierarchies[id] = hash[id].level
+    const level = hash[id]?.level
+    if (level !== undefined) {
+      hierarchies[id] = level
     } else {
       hierarchies[id] = 0
     }

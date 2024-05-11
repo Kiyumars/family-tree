@@ -6,20 +6,25 @@ import * as React from "react"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
 
-enum Mode {
-  Read,
-  Edit,
-  Create,
+const Mode = {
+  Read: 1,
+  Edit: 2,
+  Create: {
+    Child: 3,
+    Partner: 4,
+    Parent: 5,
+  },
+  Delete: 6,
 }
 
-function ReadMode({
+export function ReadMode({
   node,
   onClose,
   onSetMode,
 }: {
   node: Tables<"family_members">
   onClose: () => void
-  onSetMode: (mode: Mode) => void
+  onSetMode: (mode: number) => void
 }) {
   return (
     <div>
@@ -40,13 +45,13 @@ function ReadMode({
         <button onClick={() => onSetMode(Mode.Edit)}>Edit</button>
       </div>
       <div>
-        <button onClick={() => onSetMode(Mode.Create)}>Add child</button>
+        <button onClick={() => onSetMode(Mode.Create.Child)}>Add child</button>
       </div>
     </div>
   )
 }
 
-function EditMode({
+export function EditMode({
   familyId,
   node,
   onClose,
@@ -231,37 +236,44 @@ export default function MemberModal({
   node: Tables<"family_members">
   edges: Tables<"family_member_relationships">[]
   getRelationship: (id: number) => Tables<"relationship_types">
-  mode?: Mode
+  mode?: number
 }) {
   const [modalMode, setModalMode] = React.useState(mode)
   const [n, setNode] = React.useState(node)
-  return (
-    <ModalWrapper>
-      {modalMode === Mode.Edit ? (
-        <EditMode
-          familyId={familyId}
-          node={n}
-          onClose={onClose}
-          onSubmit={(editedNode) => {
-            setNode(editedNode)
-            setModalMode(Mode.Read)
-          }}
-        />
-      ) : modalMode === Mode.Create ? (
-        <ChildMode
-          familyId={familyId}
-          node={node}
-          edges={edges}
-          getRelationship={getRelationship}
-          onClose={onClose}
-          onSubmit={(submittedNode) => {
-            setNode(submittedNode)
-            setModalMode(Mode.Read)
-          }}
-        />
-      ) : (
-        <ReadMode node={n} onClose={onClose} onSetMode={setModalMode} />
-      )}
-    </ModalWrapper>
-  )
+  const renderContent = () => {
+    switch (modalMode) {
+      case Mode.Read:
+        return <ReadMode node={n} onClose={onClose} onSetMode={setModalMode} />
+      case Mode.Edit:
+        return (
+          <EditMode
+            familyId={familyId}
+            node={n}
+            onClose={onClose}
+            onSubmit={(editedNode) => {
+              setNode(editedNode)
+              setModalMode(Mode.Read)
+            }}
+          />
+        )
+      case Mode.Create.Child:
+        return (
+          <ChildMode
+            familyId={familyId}
+            node={node}
+            edges={edges}
+            getRelationship={getRelationship}
+            onClose={onClose}
+            onSubmit={(submittedNode) => {
+              setNode(submittedNode)
+              setModalMode(Mode.Read)
+            }}
+          />
+        )
+      default:
+        return <ReadMode node={n} onClose={onClose} onSetMode={setModalMode} />
+    }
+  }
+
+  return <ModalWrapper>{renderContent()}</ModalWrapper>
 }
