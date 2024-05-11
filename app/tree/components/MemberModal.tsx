@@ -1,9 +1,8 @@
 "use client"
 
-import { editNode } from "@/app/actions"
-import { Tables } from "@/database.types"
+import { upsertEdges, upsertNode } from "@/app/actions"
+import { Tables, TablesInsert } from "@/database.types"
 import * as React from "react"
-import { Edge } from "react-vis-graph-wrapper"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
 
@@ -58,22 +57,22 @@ function EditMode({
   onClose: () => void
   onSubmit: (node: Tables<"family_members">) => void
 }) {
-  const formAction= async (formData: FormData) => {
+  const formAction = async (formData: FormData) => {
     if (node.id) {
       formData.append("id", node.id.toString())
     }
-    formData.append("family_id", node.family_id.toString())
+    formData.append("family_id", familyId.toString())
     const death = formData.get("death_date")
     if (!death) {
       formData.delete("death_date")
     }
-    const editedNode = await editNode(formData)
+    const editedNode = await upsertNode(formData, `/tree/${familyId}`)
     onSubmit(editedNode)
   }
   return (
     <div>
       <h1 className={styles.title}>MemberModal</h1>
-        <Form node={node} formAction={formAction} />
+      <Form node={node} formAction={formAction} />
       <button onClick={onClose}>Close</button>
     </div>
   )
@@ -161,21 +160,59 @@ function Form({
   )
 }
 
-function CreateMode({
+function ChildMode({
+  node,
   familyId,
   edges,
+  getRelationship,
   onClose,
   onSubmit,
 }: {
+  node: Tables<"family_members">
   familyId: number
-  edges: Edge[]
+  edges: Tables<"family_member_relationships">[]
+  getRelationship: (id: number) => Tables<"relationship_types">
   onSubmit: (node: Tables<"family_members">) => void
   onClose: () => void
 }) {
+  let parents = [node.id]
+  edges.forEach((edge) => {
+    if (getRelationship(edge.relationship_type).type === "partner") {
+      parents.push(edge.to)
+    }
+  })
+
   return (
     <div>
       <h1>New Member</h1>
-      <Form formAction={() => console.log('create')}/>
+      <Form
+        formAction={async (formData: FormData) => {
+          formData.append("family_id", familyId.toString())
+          const death = formData.get("death_date")
+          if (!death) {
+            formData.delete("death_date")
+          }
+          const child = await upsertNode(formData)
+          // todo avoid hardcoding relationship id
+          let parentEdges: TablesInsert<"family_member_relationships">[] = []
+          parents.forEach((parent) => {
+            parentEdges.push({
+              family_id: familyId,
+              from: child.id,
+              to: parent,
+              relationship_type: 3,
+            })
+            parentEdges.push({
+              family_id: familyId,
+              from: parent,
+              to: child.id,
+              relationship_type: 6,
+            })
+          })
+          await upsertEdges(parentEdges, `/tree/${familyId}`)
+          onSubmit(child)
+        }}
+      />
       <button onClick={onClose}>Cancel</button>
     </div>
   )
@@ -186,13 +223,14 @@ export default function MemberModal({
   familyId,
   node,
   edges = [],
+  getRelationship,
   mode = Mode.Read,
 }: {
   onClose: () => void
   familyId: number
   node: Tables<"family_members">
-  edges: Edge[]
-  getRelationship: (id: number) => Tables<'relationship_types'>
+  edges: Tables<"family_member_relationships">[]
+  getRelationship: (id: number) => Tables<"relationship_types">
   mode?: Mode
 }) {
   const [modalMode, setModalMode] = React.useState(mode)
@@ -210,9 +248,11 @@ export default function MemberModal({
           }}
         />
       ) : modalMode === Mode.Create ? (
-        <CreateMode
+        <ChildMode
           familyId={familyId}
+          node={node}
           edges={edges}
+          getRelationship={getRelationship}
           onClose={onClose}
           onSubmit={(submittedNode) => {
             setNode(submittedNode)

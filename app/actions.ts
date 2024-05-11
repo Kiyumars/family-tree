@@ -19,13 +19,14 @@ export async function fetchTreeData(familyId: number) {
     .from("family_member_relationships")
     .select()
     .eq("family_id", familyId)
-  const fetchRelationshipTypes = client.from('relationship_types').select()
+  const fetchRelationshipTypes = client.from("relationship_types").select()
 
-  const [membersRes, relationshipsRes, relationshipTypesRes] = await Promise.all([
-    fetchMembers,
-    fetchRelationships,
-    fetchRelationshipTypes
-  ])
+  const [membersRes, relationshipsRes, relationshipTypesRes] =
+    await Promise.all([
+      fetchMembers,
+      fetchRelationships,
+      fetchRelationshipTypes,
+    ])
   if (membersRes.error) {
     throw new Error(membersRes.error.message)
   }
@@ -53,7 +54,7 @@ export async function checkFamily(
   return res.data != null && res.data.length > 0
 }
 
-export async function editNode(fd: FormData) {
+export async function upsertNode(fd: FormData, revalidatedPath?: string) {
   const schema = z.object({
     id: z.coerce.number().transform((x) => (x ? x : undefined)),
     family_id: z.coerce.number(),
@@ -79,7 +80,11 @@ export async function editNode(fd: FormData) {
   if (!node.success) {
     throw node.error
   }
-  return await upsert(node.data)
+  const upserted = await upsert(node.data)
+  if (revalidatedPath) {
+    revalidatePath(revalidatedPath)
+  }
+  return upserted
 }
 
 async function upsert(node: TablesInsert<"family_members">) {
@@ -91,6 +96,21 @@ async function upsert(node: TablesInsert<"family_members">) {
     .limit(1)
     .single()
   if (error != null) throw error
-  revalidatePath(`/tree/${node.family_id}`)
+  return data
+}
+
+export async function upsertEdges(
+  edges: TablesInsert<"family_member_relationships">[],
+  revalidatedPath?: string
+) {
+  const client = createClient()
+  const { data, error } = await client
+    .from("family_member_relationships")
+    .upsert(edges)
+    .select()
+  if (error != null) throw error
+  if (revalidatedPath) {
+    revalidatePath(revalidatedPath)
+  }
   return data
 }
