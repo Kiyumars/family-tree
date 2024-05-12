@@ -2,7 +2,7 @@
 
 import { Tables } from "@/database.types"
 import * as React from "react"
-import VisGraph from "react-vis-graph-wrapper"
+import VisGraph, { Network } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
@@ -71,11 +71,12 @@ export function MembersGraph({
           // physics: false,
           edges: {
             color: "#00000",
+            chosen: false,
           },
           height: "500px",
         }}
         events={{
-          select: (event: any) => {
+          selectNode: (event: any) => {
             if (event.nodes.length === 1) {
               const selectedNode = nodeSet.get(
                 event.nodes[0]
