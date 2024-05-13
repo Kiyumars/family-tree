@@ -1,11 +1,11 @@
 "use client"
 
-import { upsertEdges, upsertNode } from "@/app/actions"
+import { upsertEdges, upsertNode, upsertParents } from "@/app/actions"
 import * as Relationships from "@/app/tree/components/Relationship"
 import { Tables, TablesInsert } from "@/database.types"
 import * as React from "react"
 import styles from "./MemberModal.module.css"
-import * as Relationship from '@/app/tree/components/Relationship'
+import * as Relationship from "@/app/tree/components/Relationship"
 import ModalWrapper from "./ModalWrapper"
 
 interface Props {
@@ -64,6 +64,9 @@ export function ReadMode({
         <button onClick={() => onSetMode(Mode.Create.Child)}>Add child</button>
         <button onClick={() => onSetMode(Mode.Create.Partner)}>
           Add Partner
+        </button>
+        <button onClick={() => onSetMode(Mode.Create.Parent)}>
+          Add Parents
         </button>
       </div>
     </div>
@@ -285,6 +288,76 @@ function PartnerModal({
   )
 }
 
+function ParentModal({ familyId, node, onClose }: CreateModalProps) {
+  const [parents, setParents] = React.useState<Tables<"family_members">[]>([])
+  if (parents.length < 2) {
+    return (
+      <div>
+        <h1>
+          {" "}
+          Add {parents.length < 1 ? <>first</> : <>second</>} parent of{" "}
+          {`${node.first_name} ${node.second_name}`}
+        </h1>
+        <Form
+          formAction={async (formData: FormData) => {
+            formData.append("family_id", familyId.toString())
+            const death = formData.get("death_date")
+            if (!death) {
+              formData.delete("death_date")
+            }
+            const parent = await upsertNode(formData)
+            const relationships: TablesInsert<"family_member_relationships">[] =
+              [
+                {
+                  family_id: familyId,
+                  from: node.id,
+                  to: parent.id,
+                  relationship_type: Relationship.Types.Child.Biological,
+                },
+                {
+                  family_id: familyId,
+                  from: parent.id,
+                  to: node.id,
+                  relationship_type: Relationship.Types.Parent.Biological,
+                },
+              ]
+            await upsertEdges(relationships)
+            setParents((prev) => [...prev, parent])
+          }}
+        />
+      </div>
+    )
+  }
+  return (
+    <div>
+      <h1>
+        What is the relationship between the parents of {node.first_name}{" "}
+        {node.second_name}
+      </h1>
+      <form
+        action={async (fd: FormData) => {
+          await upsertParents(fd, familyId, parents, `/tree/${familyId}`)
+          onClose()
+        }}
+      >
+        <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
+        <select name="relationship" id="relationship-select">
+          <option value={Relationship.Types.Partner.Married}>Married</option>
+          <option value={Relationship.Types.Partner.Unmarried}>
+            Unmarried
+          </option>
+          <option value={Relationship.Types.Partner.Separated}>
+            Seperated
+          </option>
+        </select>
+        <div>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
 export default function MemberModal({
   onClose,
   familyId,
@@ -363,6 +436,18 @@ function Content({
           onClose={onClose}
           getRelationship={getRelationship}
           setModalMode={setModalMode}
+          setNode={setNode}
+        />
+      )
+    case Mode.Create.Parent:
+      return (
+        <ParentModal
+          familyId={familyId}
+          node={node}
+          edges={edges}
+          getRelationship={getRelationship}
+          setModalMode={setModalMode}
+          onClose={onClose}
           setNode={setNode}
         />
       )
