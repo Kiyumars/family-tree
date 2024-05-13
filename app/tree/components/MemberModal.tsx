@@ -4,6 +4,7 @@ import { upsertEdges, upsertNode } from "@/app/actions"
 import { Tables, TablesInsert } from "@/database.types"
 import * as React from "react"
 import styles from "./MemberModal.module.css"
+import * as Relationship from '@/app/tree/components/Relationship'
 import ModalWrapper from "./ModalWrapper"
 
 interface Props {
@@ -214,13 +215,13 @@ function ChildMode({
               family_id: familyId,
               from: child.id,
               to: parent,
-              relationship_type: 3,
+              relationship_type: Relationship.Types.Child.Biological,
             })
             parentEdges.push({
               family_id: familyId,
               from: parent,
               to: child.id,
-              relationship_type: 6,
+              relationship_type: Relationship.Types.Parent.Biological,
             })
           })
           await upsertEdges(parentEdges, `/tree/${familyId}`)
