@@ -1,6 +1,7 @@
 "use client"
 
 import { upsertEdges, upsertNode } from "@/app/actions"
+import * as Relationships from "@/app/tree/components/Relationship"
 import { Tables, TablesInsert } from "@/database.types"
 import * as React from "react"
 import styles from "./MemberModal.module.css"
@@ -14,6 +15,11 @@ interface Props {
   edges: Tables<"family_member_relationships">[]
   getRelationship: (id: number) => Tables<"relationship_types">
   mode?: number
+}
+
+type CreateModalProps = Props & {
+  setModalMode: (mode: number) => void
+  setNode: (node: Tables<"family_members">) => void
 }
 
 const Mode = {
@@ -56,6 +62,9 @@ export function ReadMode({
       </div>
       <div>
         <button onClick={() => onSetMode(Mode.Create.Child)}>Add child</button>
+        <button onClick={() => onSetMode(Mode.Create.Partner)}>
+          Add Partner
+        </button>
       </div>
     </div>
   )
@@ -208,7 +217,6 @@ function ChildMode({
             formData.delete("death_date")
           }
           const child = await upsertNode(formData)
-          // todo avoid hardcoding relationship id
           let parentEdges: TablesInsert<"family_member_relationships">[] = []
           parents.forEach((parent) => {
             parentEdges.push({
@@ -229,6 +237,50 @@ function ChildMode({
         }}
       />
       <button onClick={onClose}>Cancel</button>
+    </div>
+  )
+}
+
+function PartnerModal({
+  node,
+  edges,
+  familyId,
+  setNode,
+  onClose,
+  setModalMode,
+}: CreateModalProps) {
+  const formAction = async (formData: FormData) => {
+    formData.append("family_id", familyId.toString())
+    const death = formData.get("death_date")
+    if (!death) {
+      formData.delete("death_date")
+    }
+    const partner = await upsertNode(formData)
+    const relationships = [
+      {
+        family_id: familyId,
+        from: partner.id,
+        to: node.id,
+        relationship_type: Relationships.Types.Partner.Married,
+      },
+      {
+        family_id: familyId,
+        from: node.id,
+        to: partner.id,
+        relationship_type: Relationships.Types.Partner.Married,
+      },
+    ]
+    // todo have user confirm that partner's children are theirs
+    await upsertEdges(relationships, `/tree/${familyId}`)
+    setNode(partner)
+    setModalMode(Mode.Read)
+  }
+  return (
+    <div>
+      <h1>
+        Add partner of {node.first_name} {node.second_name}
+      </h1>
+      <Form formAction={formAction}></Form>
     </div>
   )
 }
@@ -300,6 +352,18 @@ function Content({
             setNode(submittedNode)
             setModalMode(Mode.Read)
           }}
+        />
+      )
+    case Mode.Create.Partner:
+      return (
+        <PartnerModal
+          familyId={familyId}
+          node={node}
+          edges={edges}
+          onClose={onClose}
+          getRelationship={getRelationship}
+          setModalMode={setModalMode}
+          setNode={setNode}
         />
       )
     default:
