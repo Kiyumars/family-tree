@@ -1,11 +1,11 @@
 "use server"
 
+import * as Relationship from "@/app/tree/components/Relationship"
 import { Tables, TablesInsert } from "@/database.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import { notFound } from "next/navigation"
-
 import { z } from "zod"
 
 export async function fetchTreeData(familyId: number) {
@@ -125,7 +125,7 @@ export async function upsertParents(
     id: z.coerce.number(),
   })
   const relationship = schema.safeParse({
-    id: fd.get('relationship')
+    id: fd.get("relationship"),
   })
   if (!relationship.success) {
     throw relationship.error
@@ -133,18 +133,71 @@ export async function upsertParents(
   if (parents.length != 2) {
     throw new Error("parents do not have length 2")
   }
-  await upsertEdges([
-    {
+  await upsertEdges(
+    [
+      {
+        family_id: familyId,
+        from: parents[0].id,
+        to: parents[1].id,
+        relationship_type: relationship.data.id,
+      },
+      {
+        family_id: familyId,
+        from: parents[1].id,
+        to: parents[0].id,
+        relationship_type: relationship.data.id,
+      },
+    ],
+    revalidatedPath
+  )
+}
+
+export async function upsertChildsParents({
+  parents,
+  childId,
+  familyId,
+  revalidatedPath,
+}: {
+  parents: FormDataEntryValue[]
+  familyId: number
+  childId: number
+  revalidatedPath?: string
+}) {
+  const schema = z.object({
+    parents: z.string().array(),
+  })
+  const parse = schema.safeParse({
+    parents: parents,
+  })
+  if (!parse.success) {
+    throw Error("could not parse parents from form")
+  }
+
+  let parentEdges: TablesInsert<"family_member_relationships">[] = []
+  parse.data.parents.forEach((pr) => {
+    const [parent, relationship] = pr.split("-")
+    const parentId = parseInt(parent, 10)
+    const relationshipId = parseInt(relationship, 10)
+    if (isNaN(parentId) || isNaN(relationshipId)) {
+      throw new Error("either parentId or relationshipId is NaN")
+    }
+    parentEdges.push({
       family_id: familyId,
-      from: parents[0].id,
-      to: parents[1].id,
-      relationship_type: relationship.data.id,
-    },
-    {
+      from: childId,
+      to: parentId,
+      relationship_type:
+        relationshipId === Relationship.Types.Parent.Adopted
+          ? Relationship.Types.Child.Adopted
+          : Relationship.Types.Child.Biological,
+    })
+    parentEdges.push({
       family_id: familyId,
-      from: parents[1].id,
-      to: parents[0].id,
-      relationship_type: relationship.data.id,
-    },
-  ], revalidatedPath)
+      from: parentId,
+      to: childId,
+      relationship_type: relationshipId,
+    })
+  })
+  await upsertEdges(parentEdges, revalidatedPath)
+
+  return parse.data.parents
 }

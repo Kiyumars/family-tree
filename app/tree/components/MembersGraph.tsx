@@ -2,7 +2,7 @@
 
 import { Tables } from "@/database.types"
 import * as React from "react"
-import VisGraph, { Network } from "react-vis-graph-wrapper"
+import VisGraph from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
@@ -36,6 +36,9 @@ export function MembersGraph({
   }
   const nodeSet = new DataSet(nodes)
   const edgeSet = new DataSet(edges)
+  const getFamilyMember = (id: number) => {
+    return nodeSet.get(id)
+  }
 
   const [selected, setSelected] = React.useState<SelectedProps | undefined>(
     undefined
@@ -48,6 +51,7 @@ export function MembersGraph({
           node={selected.node}
           edges={selected.relationships}
           getRelationship={getRelationship}
+          getFamilyMember={getFamilyMember}
           onClose={() => setSelected(undefined)}
         />
       )}
