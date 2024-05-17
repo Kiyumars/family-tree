@@ -1,5 +1,6 @@
 import MemberModal, {
   EditMode,
+  PartnerModal,
   ReadMode,
 } from "@/app/tree/components/MemberModal"
 import { Node } from "@/app/tree/components/MembersGraph"
@@ -54,6 +55,24 @@ export const Edit: Story = {
             node={fakeMember}
             onClose={() => {}}
             onSubmit={() => {}}
+          />
+        </ModalWrapper>
+      </div>
+    )
+  },
+}
+
+export const CreatePartner: Story = {
+  render: () => {
+    return (
+      <div id="modal-root">
+        <ModalWrapper>
+          <PartnerModal
+            node={fakeMember}
+            onClose={() => {}}
+            familyId={1}
+            setModalMode={() => {}}
+            setNode={() => {}}
           />
         </ModalWrapper>
       </div>

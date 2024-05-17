@@ -343,13 +343,13 @@ function ChildMode({
   )
 }
 
-function PartnerModal({
+export function PartnerModal({
   node,
   familyId,
   setNode,
   onClose,
   setModalMode,
-}: CreateModalProps) {
+}: Omit<CreateModalProps, 'edges' | 'getRelationship' | 'getFamilyMember'>) {
   return (
     <div>
       <h1>
@@ -537,10 +537,7 @@ function Content({
         <PartnerModal
           familyId={familyId}
           node={node}
-          edges={edges}
           onClose={onClose}
-          getRelationship={getRelationship}
-          getFamilyMember={getFamilyMember}
           setModalMode={setModalMode}
           setNode={setNode}
         />
