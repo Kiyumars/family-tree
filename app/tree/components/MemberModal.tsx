@@ -5,6 +5,7 @@ import {
   upsertEdges,
   upsertNode,
   upsertParents,
+  upsertPartnerRelationships,
 } from "@/app/actions"
 import { Tables, TablesInsert } from "@/database.types"
 import { FullItem } from "vis-data/declarations/data-interface"
@@ -344,44 +345,48 @@ function ChildMode({
 
 function PartnerModal({
   node,
-  edges,
   familyId,
   setNode,
   onClose,
   setModalMode,
 }: CreateModalProps) {
-  const formAction = async (formData: FormData) => {
-    formData.append("family_id", familyId.toString())
-    const death = formData.get("death_date")
-    if (!death) {
-      formData.delete("death_date")
-    }
-    const partner = await upsertNode(formData)
-    const relationships = [
-      {
-        family_id: familyId,
-        from: partner.id,
-        to: node.id,
-        relationship_type: Relationship.Types.Partner.Married,
-      },
-      {
-        family_id: familyId,
-        from: node.id,
-        to: partner.id,
-        relationship_type: Relationship.Types.Partner.Married,
-      },
-    ]
-    // todo have user confirm that partner's children are theirs
-    await upsertEdges(relationships, `/tree/${familyId}`)
-    setNode(partner)
-    setModalMode(Mode.Read)
-  }
   return (
     <div>
       <h1>
         Add partner of {node.first_name} {node.second_name}
       </h1>
-      <Form formAction={formAction}></Form>
+      <Form
+        formAction={async (fd) => {
+          fd.append("family_id", familyId.toString())
+          const death = fd.get("death_date")
+          if (!death) {
+            fd.delete("death_date")
+          }
+          const partner = await upsertNode(fd)
+          await upsertPartnerRelationships({
+            fd,
+            familyId,
+            partners: [node.id, partner.id],
+            revalidatedPath: `/tree/${familyId}`,
+          })
+          setNode(partner)
+          setModalMode(Mode.Read)
+        }}
+      >
+        <div>
+          <label htmlFor="relationship-select">Relationship type: </label>
+          <select name="relationship" id="relationship-select">
+            <option value={Relationship.Types.Partner.Married}>Married</option>
+            <option value={Relationship.Types.Partner.Unmarried}>
+              Unmarried
+            </option>
+            <option value={Relationship.Types.Partner.Separated}>
+              Seperated
+            </option>
+          </select>
+        </div>
+        <button onClick={onClose}>Cancel</button>
+      </Form>
     </div>
   )
 }

@@ -201,3 +201,40 @@ export async function upsertChildsParents({
 
   return parse.data.parents
 }
+
+export async function upsertPartnerRelationships({
+  fd,
+  partners,
+  familyId,
+  revalidatedPath
+}: {
+  fd: FormData
+  partners: [number, number]
+  familyId: number
+  revalidatedPath?: string
+}) {
+  const schema = z.object({
+    relationship: z.coerce.number(),
+  })
+  const parse = schema.safeParse({
+    relationship: fd.get("relationship"),
+  })
+  if (!parse.success) {
+    throw Error("could not parse relationship from form")
+  }
+  const relationships = [
+    {
+      family_id: familyId,
+      from: partners[0],
+      to: partners[1],
+      relationship_type: parse.data.relationship,
+    },
+    {
+      family_id: familyId,
+      from: partners[1],
+      to: partners[0],
+      relationship_type: parse.data.relationship,
+    },
+  ]
+  await upsertEdges(relationships, revalidatedPath)
+}
