@@ -242,7 +242,7 @@ function PartnerSelection({
   )
 }
 
-function ChildMode({
+export function ChildMode({
   node,
   familyId,
   edges,

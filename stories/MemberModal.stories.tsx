@@ -1,4 +1,5 @@
 import MemberModal, {
+  ChildMode,
   EditMode,
   PartnerModal,
   ReadMode,
@@ -7,6 +8,9 @@ import { Node } from "@/app/tree/components/MembersGraph"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
 import { Meta, StoryObj } from "@storybook/react"
 import * as React from "react"
+import { createMembers } from "./util"
+import * as Relationship from "@/app/tree/components/Relationship"
+import { Tables } from "@/database.types"
 
 const meta: Meta<typeof MemberModal> = {
   component: MemberModal,
@@ -69,6 +73,105 @@ export const CreatePartner: Story = {
         <ModalWrapper>
           <PartnerModal
             node={fakeMember}
+            onClose={() => {}}
+            familyId={1}
+            setModalMode={() => {}}
+            setNode={() => {}}
+          />
+        </ModalWrapper>
+      </div>
+    )
+  },
+}
+
+export const CreateChildWithTwoParents: Story = {
+  render: () => {
+    const members = createMembers([
+      { first_name: "Husband", second_name: "Man" },
+      { first_name: "Current", second_name: "Wife" },
+      { first_name: "Ex", second_name: "Wife" },
+    ])
+    const getFamilyMember = (id: number) => {
+      return members[id - 1]
+    }
+    const edges = [
+      {
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 2,
+        relationship_type: Relationship.Types.Partner.Married,
+      },
+      {
+        id: 2,
+        family_id: 1,
+        from: 2,
+        to: 1,
+        relationship_type: Relationship.Types.Partner.Married,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 3,
+        relationship_type: Relationship.Types.Partner.Separated,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 3,
+        to: 1,
+        relationship_type: Relationship.Types.Partner.Separated,
+      },
+    ]
+
+    return (
+      <div id="modal-root">
+        <ModalWrapper>
+          <ChildMode
+            node={members[0]}
+            edges={edges}
+            getFamilyMember={getFamilyMember}
+            getRelationship={(id: number): Tables<"relationship_types"> => {
+              switch (id) {
+                case Relationship.Types.Partner.Married:
+                  return { id, type: "partner", subtype: "married" }
+                case Relationship.Types.Partner.Separated:
+                  return { id, type: "partner", subtype: "seperated" }
+                default:
+                  return { id, type: "partner", subtype: "married" }
+              }
+            }}
+            onClose={() => {}}
+            familyId={1}
+            setModalMode={() => {}}
+            setNode={() => {}}
+          />
+        </ModalWrapper>
+      </div>
+    )
+  },
+}
+
+export const CreateChildWithOneParent: Story = {
+  render: () => {
+    const members = createMembers([
+      { first_name: "Parent", second_name: "One" },
+    ])
+    const getFamilyMember = (id: number) => {
+      return members[id - 1]
+    }
+
+    return (
+      <div id="modal-root">
+        <ModalWrapper>
+          <ChildMode
+            node={members[0]}
+            edges={[]}
+            getFamilyMember={getFamilyMember}
+            getRelationship={(id: number): Tables<"relationship_types"> => {
+              return { id, type: "partner", subtype: "married" }
+            }}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
