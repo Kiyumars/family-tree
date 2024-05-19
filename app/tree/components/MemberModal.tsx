@@ -349,7 +349,7 @@ export function PartnerModal({
   setNode,
   onClose,
   setModalMode,
-}: Omit<CreateModalProps, 'edges' | 'getRelationship' | 'getFamilyMember'>) {
+}: Omit<CreateModalProps, "edges" | "getRelationship" | "getFamilyMember">) {
   return (
     <div>
       <h1>
@@ -391,8 +391,28 @@ export function PartnerModal({
   )
 }
 
-function ParentModal({ familyId, node, onClose }: CreateModalProps) {
-  const [parents, setParents] = React.useState<Tables<"family_members">[]>([])
+export function ParentModal({
+  familyId,
+  node,
+  onClose,
+  edges,
+  getRelationship,
+  getFamilyMember,
+}: CreateModalProps) {
+  const tmp: FullItem<Tables<"family_members">, "id">[] = []
+  edges.forEach((e) => {
+    if (
+      e.to === node.id &&
+      getRelationship(e.relationship_type).type === "parent"
+    ) {
+      const parent = getFamilyMember(e.from)
+      if (parent) {
+        tmp.push(parent)
+      }
+    }
+  })
+
+  const [parents, setParents] = React.useState<Tables<"family_members">[]>(tmp)
   if (parents.length < 2) {
     return (
       <div>
@@ -435,7 +455,7 @@ function ParentModal({ familyId, node, onClose }: CreateModalProps) {
     <div>
       <h1>
         What is the relationship between the parents of {node.first_name}{" "}
-        {node.second_name}
+        {node.second_name}?
       </h1>
       <form
         action={async (fd: FormData) => {
