@@ -1,8 +1,7 @@
 import Members from "@/app/tree/components/Members"
-import { Meta, StoryObj } from "@storybook/react"
-import { createMembers } from "./util"
 import { Tables } from "@/database.types"
-import { setHierarchies } from "@/app/tree/utils/utils"
+import { Meta, StoryObj } from "@storybook/react"
+import { createMembers } from "../util"
 
 const meta: Meta<typeof Members> = {
   component: Members,
