@@ -1,4 +1,4 @@
-export const Types = {
+const  RelationshipIds = {
     Partner: {
         Married: 1,
         Unmarried: 2,
@@ -13,3 +13,5 @@ export const Types = {
         Adopted: 7
     }
 }
+
+export default RelationshipIds

@@ -1,6 +1,6 @@
 "use server"
 
-import * as Relationship from "@/app/tree/components/Relationship"
+import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { FamilyMember, FamilyMemberUpsert } from "@/common.types"
 import { TablesInsert } from "@/database.types"
 import { createClient } from "@/utils/supabase/server"
@@ -187,9 +187,9 @@ export async function upsertChildsParents({
       from: childId,
       to: parentId,
       relationship_type:
-        relationshipId === Relationship.Types.Parent.Adopted
-          ? Relationship.Types.Child.Adopted
-          : Relationship.Types.Child.Biological,
+        relationshipId === RelationshipIds.Parent.Adopted
+          ? RelationshipIds.Child.Adopted
+          : RelationshipIds.Child.Biological,
     })
     parentEdges.push({
       family_id: familyId,
@@ -207,7 +207,7 @@ export async function upsertPartnerRelationships({
   fd,
   partners,
   familyId,
-  revalidatedPath
+  revalidatedPath,
 }: {
   fd: FormData
   partners: [number, number]

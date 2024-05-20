@@ -12,7 +12,7 @@ import { Tables, TablesInsert } from "@/database.types"
 import { FullItem } from "vis-data/declarations/data-interface"
 import * as React from "react"
 import styles from "./MemberModal.module.css"
-import * as Relationship from "@/app/tree/components/Relationship"
+import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import ModalWrapper from "./ModalWrapper"
 
 interface Props {
@@ -21,9 +21,7 @@ interface Props {
   node: FamilyMember
   edges: Tables<"family_member_relationships">[]
   getRelationship: (id: number) => Tables<"relationship_types">
-  getFamilyMember: (
-    id: number
-  ) => FullItem<FamilyMember, "id"> | null
+  getFamilyMember: (id: number) => FullItem<FamilyMember, "id"> | null
   mode?: number
 }
 
@@ -325,12 +323,12 @@ export function ChildMode({
               </label>
               <select name="parents" id={`parents-${parent.id}`}>
                 <option
-                  value={`${parent.id}-${Relationship.Types.Parent.Biological}`}
+                  value={`${parent.id}-${RelationshipIds.Parent.Biological}`}
                 >
                   Biolgical
                 </option>
                 <option
-                  value={`${parent.id}-${Relationship.Types.Parent.Adopted}`}
+                  value={`${parent.id}-${RelationshipIds.Parent.Adopted}`}
                 >
                   Adopter
                 </option>
@@ -377,11 +375,11 @@ export function PartnerModal({
         <div>
           <label htmlFor="relationship-select">Relationship type: </label>
           <select name="relationship" id="relationship-select">
-            <option value={Relationship.Types.Partner.Married}>Married</option>
-            <option value={Relationship.Types.Partner.Unmarried}>
+            <option value={RelationshipIds.Partner.Married}>Married</option>
+            <option value={RelationshipIds.Partner.Unmarried}>
               Unmarried
             </option>
-            <option value={Relationship.Types.Partner.Separated}>
+            <option value={RelationshipIds.Partner.Separated}>
               Seperated
             </option>
           </select>
@@ -436,13 +434,13 @@ export function ParentModal({
                   family_id: familyId,
                   from: node.id,
                   to: parent.id,
-                  relationship_type: Relationship.Types.Child.Biological,
+                  relationship_type: RelationshipIds.Child.Biological,
                 },
                 {
                   family_id: familyId,
                   from: parent.id,
                   to: node.id,
-                  relationship_type: Relationship.Types.Parent.Biological,
+                  relationship_type: RelationshipIds.Parent.Biological,
                 },
               ]
             await upsertEdges(relationships)
@@ -466,11 +464,11 @@ export function ParentModal({
       >
         <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
         <select name="relationship" id="relationship-select">
-          <option value={Relationship.Types.Partner.Married}>Married</option>
-          <option value={Relationship.Types.Partner.Unmarried}>
+          <option value={RelationshipIds.Partner.Married}>Married</option>
+          <option value={RelationshipIds.Partner.Unmarried}>
             Unmarried
           </option>
-          <option value={Relationship.Types.Partner.Separated}>
+          <option value={RelationshipIds.Partner.Separated}>
             Seperated
           </option>
         </select>

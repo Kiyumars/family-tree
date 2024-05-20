@@ -1,8 +1,6 @@
-import MemberModal, {
-    ChildMode
-} from "@/app/tree/components/MemberModal"
+import MemberModal, { ChildMode } from "@/app/tree/components/MemberModal"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
-import * as Relationship from "@/app/tree/components/Relationship"
+import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers, fakeGetRelationship } from "../util"
 
@@ -28,14 +26,14 @@ export const CreateChildWithTwoParents: Story = {
         family_id: 1,
         from: 1,
         to: 2,
-        relationship_type: Relationship.Types.Partner.Married,
+        relationship_type: RelationshipIds.Partner.Married,
       },
       {
         id: 2,
         family_id: 1,
         from: 2,
         to: 1,
-        relationship_type: Relationship.Types.Partner.Married,
+        relationship_type: RelationshipIds.Partner.Married,
       },
     ]
 
@@ -74,28 +72,28 @@ export const CreateChildWithMultiplePossibleParents: Story = {
         family_id: 1,
         from: 1,
         to: 2,
-        relationship_type: Relationship.Types.Partner.Married,
+        relationship_type: RelationshipIds.Partner.Married,
       },
       {
         id: 2,
         family_id: 1,
         from: 2,
         to: 1,
-        relationship_type: Relationship.Types.Partner.Married,
+        relationship_type: RelationshipIds.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 1,
         to: 3,
-        relationship_type: Relationship.Types.Partner.Separated,
+        relationship_type: RelationshipIds.Partner.Separated,
       },
       {
         id: 1,
         family_id: 1,
         from: 3,
         to: 1,
-        relationship_type: Relationship.Types.Partner.Separated,
+        relationship_type: RelationshipIds.Partner.Separated,
       },
     ]
 
