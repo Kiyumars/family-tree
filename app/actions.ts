@@ -1,7 +1,7 @@
 "use server"
 
-import * as Relationship from "@/app/tree/components/Relationship"
-import { Tables, TablesInsert } from "@/database.types"
+import RelationshipIds from "@/app/tree/components/RelationshipIds"
+import { FamilyMember, FamilyMemberUpsert, RelationshipUpsert } from "@/common.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
@@ -87,7 +87,7 @@ export async function upsertNode(fd: FormData, revalidatedPath?: string) {
   return upserted
 }
 
-async function upsert(node: TablesInsert<"family_members">) {
+async function upsert(node: FamilyMemberUpsert) {
   const client = createClient()
   const { data, error } = await client
     .from("family_members")
@@ -100,7 +100,7 @@ async function upsert(node: TablesInsert<"family_members">) {
 }
 
 export async function upsertEdges(
-  edges: TablesInsert<"family_member_relationships">[],
+  edges: RelationshipUpsert[],
   revalidatedPath?: string
 ) {
   const client = createClient()
@@ -118,7 +118,7 @@ export async function upsertEdges(
 export async function upsertParents(
   fd: FormData,
   familyId: number,
-  parents: Tables<"family_members">[],
+  parents: FamilyMember[],
   revalidatedPath?: string
 ) {
   const schema = z.object({
@@ -173,7 +173,7 @@ export async function upsertChildsParents({
     throw Error("could not parse parents from form")
   }
 
-  let parentEdges: TablesInsert<"family_member_relationships">[] = []
+  let parentEdges: RelationshipUpsert[] = []
   parse.data.parents.forEach((pr) => {
     const [parent, relationship] = pr.split("-")
     const parentId = parseInt(parent, 10)
@@ -186,9 +186,9 @@ export async function upsertChildsParents({
       from: childId,
       to: parentId,
       relationship_type:
-        relationshipId === Relationship.Types.Parent.Adopted
-          ? Relationship.Types.Child.Adopted
-          : Relationship.Types.Child.Biological,
+        relationshipId === RelationshipIds.Parent.Adopted
+          ? RelationshipIds.Child.Adopted
+          : RelationshipIds.Child.Biological,
     })
     parentEdges.push({
       family_id: familyId,
@@ -206,7 +206,7 @@ export async function upsertPartnerRelationships({
   fd,
   partners,
   familyId,
-  revalidatedPath
+  revalidatedPath,
 }: {
   fd: FormData
   partners: [number, number]

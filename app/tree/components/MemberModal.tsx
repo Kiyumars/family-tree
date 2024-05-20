@@ -7,28 +7,26 @@ import {
   upsertParents,
   upsertPartnerRelationships,
 } from "@/app/actions"
-import { Tables, TablesInsert } from "@/database.types"
-import { FullItem } from "vis-data/declarations/data-interface"
+import RelationshipIds from "@/app/tree/components/RelationshipIds"
+import { FamilyMember, Relationship, RelationshipType, RelationshipUpsert } from "@/common.types"
 import * as React from "react"
+import { FullItem } from "vis-data/declarations/data-interface"
 import styles from "./MemberModal.module.css"
-import * as Relationship from "@/app/tree/components/Relationship"
 import ModalWrapper from "./ModalWrapper"
 
 interface Props {
   onClose: () => void
   familyId: number
-  node: Tables<"family_members">
-  edges: Tables<"family_member_relationships">[]
-  getRelationship: (id: number) => Tables<"relationship_types">
-  getFamilyMember: (
-    id: number
-  ) => FullItem<Tables<"family_members">, "id"> | null
+  node: FamilyMember
+  edges: Relationship[]
+  getRelationship: (id: number) => RelationshipType
+  getFamilyMember: (id: number) => FullItem<FamilyMember, "id"> | null
   mode?: number
 }
 
 type CreateModalProps = Props & {
   setModalMode: (mode: number) => void
-  setNode: (node: Tables<"family_members">) => void
+  setNode: (node: FamilyMember) => void
 }
 
 const Mode = {
@@ -47,7 +45,7 @@ export function ReadMode({
   onClose,
   onSetMode,
 }: {
-  node: Tables<"family_members">
+  node: FamilyMember
   onClose: () => void
   onSetMode: (mode: number) => void
 }) {
@@ -89,9 +87,9 @@ export function EditMode({
   onSubmit,
 }: {
   familyId: number
-  node: Tables<"family_members">
+  node: FamilyMember
   onClose: () => void
-  onSubmit: (node: Tables<"family_members">) => void
+  onSubmit: (node: FamilyMember) => void
 }) {
   const formAction = async (formData: FormData) => {
     if (node.id) {
@@ -120,7 +118,7 @@ function Form({
   formAction,
 }: {
   children?: React.ReactNode
-  node?: Tables<"family_members">
+  node?: FamilyMember
   formAction: (formData: FormData) => void
 }) {
   return (
@@ -207,9 +205,9 @@ function PartnerSelection({
   setPartners,
   onClose,
 }: {
-  parent: FullItem<Tables<"family_members">, "id">
-  partners: FullItem<Tables<"family_members">, "id">[]
-  setPartners: (partners: FullItem<Tables<"family_members">, "id">[]) => void
+  parent: FullItem<FamilyMember, "id">
+  partners: FullItem<FamilyMember, "id">[]
+  setPartners: (partners: FullItem<FamilyMember, "id">[]) => void
   onClose: () => void
 }) {
   const [current, setCurrent] = React.useState(partners[0])
@@ -252,7 +250,7 @@ export function ChildMode({
   setModalMode,
   setNode,
 }: CreateModalProps) {
-  const tmp: FullItem<Tables<"family_members">, "id">[] = []
+  const tmp: FullItem<FamilyMember, "id">[] = []
   edges.forEach((edge) => {
     if (
       edge.from === node.id &&
@@ -324,12 +322,12 @@ export function ChildMode({
               </label>
               <select name="parents" id={`parents-${parent.id}`}>
                 <option
-                  value={`${parent.id}-${Relationship.Types.Parent.Biological}`}
+                  value={`${parent.id}-${RelationshipIds.Parent.Biological}`}
                 >
                   Biolgical
                 </option>
                 <option
-                  value={`${parent.id}-${Relationship.Types.Parent.Adopted}`}
+                  value={`${parent.id}-${RelationshipIds.Parent.Adopted}`}
                 >
                   Adopter
                 </option>
@@ -376,11 +374,11 @@ export function PartnerModal({
         <div>
           <label htmlFor="relationship-select">Relationship type: </label>
           <select name="relationship" id="relationship-select">
-            <option value={Relationship.Types.Partner.Married}>Married</option>
-            <option value={Relationship.Types.Partner.Unmarried}>
+            <option value={RelationshipIds.Partner.Married}>Married</option>
+            <option value={RelationshipIds.Partner.Unmarried}>
               Unmarried
             </option>
-            <option value={Relationship.Types.Partner.Separated}>
+            <option value={RelationshipIds.Partner.Separated}>
               Seperated
             </option>
           </select>
@@ -399,7 +397,7 @@ export function ParentModal({
   getRelationship,
   getFamilyMember,
 }: CreateModalProps) {
-  const tmp: FullItem<Tables<"family_members">, "id">[] = []
+  const tmp: FullItem<FamilyMember, "id">[] = []
   edges.forEach((e) => {
     if (
       e.to === node.id &&
@@ -412,7 +410,7 @@ export function ParentModal({
     }
   })
 
-  const [parents, setParents] = React.useState<Tables<"family_members">[]>(tmp)
+  const [parents, setParents] = React.useState<FamilyMember[]>(tmp)
   if (parents.length < 2) {
     return (
       <div>
@@ -429,19 +427,19 @@ export function ParentModal({
               formData.delete("death_date")
             }
             const parent = await upsertNode(formData)
-            const relationships: TablesInsert<"family_member_relationships">[] =
+            const relationships: RelationshipUpsert[] =
               [
                 {
                   family_id: familyId,
                   from: node.id,
                   to: parent.id,
-                  relationship_type: Relationship.Types.Child.Biological,
+                  relationship_type: RelationshipIds.Child.Biological,
                 },
                 {
                   family_id: familyId,
                   from: parent.id,
                   to: node.id,
-                  relationship_type: Relationship.Types.Parent.Biological,
+                  relationship_type: RelationshipIds.Parent.Biological,
                 },
               ]
             await upsertEdges(relationships)
@@ -465,11 +463,11 @@ export function ParentModal({
       >
         <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
         <select name="relationship" id="relationship-select">
-          <option value={Relationship.Types.Partner.Married}>Married</option>
-          <option value={Relationship.Types.Partner.Unmarried}>
+          <option value={RelationshipIds.Partner.Married}>Married</option>
+          <option value={RelationshipIds.Partner.Unmarried}>
             Unmarried
           </option>
-          <option value={Relationship.Types.Partner.Separated}>
+          <option value={RelationshipIds.Partner.Separated}>
             Seperated
           </option>
         </select>
@@ -522,7 +520,7 @@ function Content({
 }: Props & {
   modalMode: number
   setModalMode: (mode: number) => void
-  setNode: (node: Tables<"family_members">) => void
+  setNode: (node: FamilyMember) => void
 }) {
   switch (modalMode) {
     case Mode.Read:

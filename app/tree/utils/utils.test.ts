@@ -1,12 +1,12 @@
+import { RelationshipType } from "@/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
-import { setHierarchies } from "./utils"
 import { createMembers } from "../../../stories/util"
-import { Tables } from "@/database.types"
+import { setHierarchies } from "./utils"
 
 
 function getRelationship(id: number)  {
-  const rtMap: Record<number, Tables<"relationship_types">> = {
+  const rtMap: Record<number, RelationshipType> = {
     1: { id: 1, type: "partner", subtype: "married" },
     2: { id: 2, type: "partner", subtype: "unmarried" },
     3: { id: 3, type: "child", subtype: "biological" },

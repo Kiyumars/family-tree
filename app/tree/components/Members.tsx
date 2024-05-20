@@ -1,13 +1,12 @@
-import * as React from "react"
-import { Tables } from "@/database.types"
-import MembersGraph from "./MembersGraph"
+import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import { setHierarchies } from "../utils/utils"
+import MembersGraph from "./MembersGraph"
 
 interface Props {
   familyId: number
-  familyMembers: Tables<"family_members">[]
-  relationships: Tables<"family_member_relationships">[]
-  relationshipTypes: Tables<"relationship_types">[]
+  familyMembers: FamilyMember[]
+  relationships: Relationship[]
+  relationshipTypes: RelationshipType[]
 }
 
 export default function Members({
@@ -24,7 +23,7 @@ export default function Members({
     )
   }
 
-  const rtMap: Record<number, Tables<"relationship_types">> = {}
+  const rtMap: Record<number, RelationshipType> = {}
   relationshipTypes.forEach((rt) => {
     rtMap[rt.id] = rt
   })

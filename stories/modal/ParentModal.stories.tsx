@@ -1,8 +1,6 @@
-import MemberModal, {
-    ParentModal
-} from "@/app/tree/components/MemberModal"
+import MemberModal, { ParentModal } from "@/app/tree/components/MemberModal"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
-import * as Relationship from "@/app/tree/components/Relationship"
+import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers, fakeGetRelationship } from "../util"
 
@@ -72,14 +70,14 @@ export const CreateParentSecondScreen: Story = {
                 family_id: 1,
                 from: 1,
                 to: 2,
-                relationship_type: Relationship.Types.Child.Adopted,
+                relationship_type: RelationshipIds.Child.Adopted,
               },
               {
                 id: 2,
                 family_id: 1,
                 from: 2,
                 to: 1,
-                relationship_type: Relationship.Types.Parent.Biological,
+                relationship_type: RelationshipIds.Parent.Biological,
               },
             ]}
             getFamilyMember={getFamilyMember}
@@ -122,28 +120,28 @@ export const CreateParentThirdScreen: Story = {
                 family_id: 1,
                 from: 1,
                 to: 2,
-                relationship_type: Relationship.Types.Child.Adopted,
+                relationship_type: RelationshipIds.Child.Adopted,
               },
               {
                 id: 2,
                 family_id: 1,
                 from: 2,
                 to: 1,
-                relationship_type: Relationship.Types.Parent.Biological,
+                relationship_type: RelationshipIds.Parent.Biological,
               },
               {
                 id: 3,
                 family_id: 1,
                 from: 3,
                 to: 1,
-                relationship_type: Relationship.Types.Parent.Biological,
+                relationship_type: RelationshipIds.Parent.Biological,
               },
               {
                 id: 4,
                 family_id: 1,
                 from: 1,
                 to: 3,
-                relationship_type: Relationship.Types.Child.Biological,
+                relationship_type: RelationshipIds.Child.Biological,
               },
             ]}
             getFamilyMember={getFamilyMember}
