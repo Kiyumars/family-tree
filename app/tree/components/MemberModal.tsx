@@ -8,8 +8,7 @@ import {
   upsertPartnerRelationships,
 } from "@/app/actions"
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
-import { FamilyMember, Relationship, RelationshipUpsert } from "@/common.types"
-import { Tables } from "@/database.types"
+import { FamilyMember, Relationship, RelationshipType, RelationshipUpsert } from "@/common.types"
 import * as React from "react"
 import { FullItem } from "vis-data/declarations/data-interface"
 import styles from "./MemberModal.module.css"
@@ -20,7 +19,7 @@ interface Props {
   familyId: number
   node: FamilyMember
   edges: Relationship[]
-  getRelationship: (id: number) => Tables<"relationship_types">
+  getRelationship: (id: number) => RelationshipType
   getFamilyMember: (id: number) => FullItem<FamilyMember, "id"> | null
   mode?: number
 }

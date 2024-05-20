@@ -1,18 +1,17 @@
 "use client"
 
-import { Tables } from "@/database.types"
+import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import * as React from "react"
 import VisGraph from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
-import { FamilyMember, Relationship } from "@/common.types"
 
 interface Props {
   familyId: number
   nodes: FamilyMember[]
   edges: Relationship[]
-  relationshipTypes: Record<number, Tables<"relationship_types">>
+  relationshipTypes: Record<number, RelationshipType>
 }
 
 interface SelectedProps {

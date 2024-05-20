@@ -1,5 +1,5 @@
 import Members from "@/app/tree/components/Members"
-import { Tables } from "@/database.types"
+import { RelationshipType } from "@/common.types"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers } from "../util"
 
@@ -10,7 +10,7 @@ const meta: Meta<typeof Members> = {
 export default meta
 type Story = StoryObj<typeof Members>
 
-const RELATIONSHIP_TYPES: Tables<"relationship_types">[] = [
+const RELATIONSHIP_TYPES: RelationshipType[] = [
   { id: 1, type: "partner", subtype: "married" },
   { id: 2, type: "partner", subtype: "unmarried" },
   { id: 3, type: "child", subtype: "biological" },
@@ -20,7 +20,7 @@ const RELATIONSHIP_TYPES: Tables<"relationship_types">[] = [
   { id: 7, type: "parent", subtype: "adopted" },
 ]
 
-const rtMap: Record<number, Tables<"relationship_types">> = {}
+const rtMap: Record<number, RelationshipType> = {}
 RELATIONSHIP_TYPES.forEach((rt) => {
   rtMap[rt.id] = rt
 })

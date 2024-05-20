@@ -1,6 +1,5 @@
 import { Node } from "@/app/tree/components/MembersGraph"
-import { FamilyMember } from "@/common.types"
-import { Tables } from "@/database.types"
+import { FamilyMember, RelationshipType } from "@/common.types"
 
 interface FakeMember {
   first_name: string
@@ -48,7 +47,7 @@ export function createMembers(
 }
 
 export function fakeGetRelationship(id: number) {
-  const rtMap: Record<number, Tables<"relationship_types">> = {
+  const rtMap: Record<number, RelationshipType> = {
     1: { id: 1, type: "partner", subtype: "married" },
     2: { id: 2, type: "partner", subtype: "unmarried" },
     3: { id: 3, type: "child", subtype: "biological" },
