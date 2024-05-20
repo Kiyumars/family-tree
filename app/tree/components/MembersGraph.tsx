@@ -6,18 +6,18 @@ import VisGraph from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
-import { FamilyMember } from "@/common.types"
+import { FamilyMember, Relationship } from "@/common.types"
 
 interface Props {
   familyId: number
   nodes: FamilyMember[]
-  edges: Tables<"family_member_relationships">[]
+  edges: Relationship[]
   relationshipTypes: Record<number, Tables<"relationship_types">>
 }
 
 interface SelectedProps {
   node: FamilyMember
-  relationships: Tables<"family_member_relationships">[]
+  relationships: Relationship[]
 }
 
 export type Node = FamilyMember & {

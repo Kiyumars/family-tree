@@ -2,12 +2,12 @@ import * as React from "react"
 import { Tables } from "@/database.types"
 import MembersGraph from "./MembersGraph"
 import { setHierarchies } from "../utils/utils"
-import { FamilyMember } from "@/common.types"
+import { FamilyMember, Relationship } from "@/common.types"
 
 interface Props {
   familyId: number
   familyMembers: FamilyMember[]
-  relationships: Tables<"family_member_relationships">[]
+  relationships: Relationship[]
   relationshipTypes: Tables<"relationship_types">[]
 }
 

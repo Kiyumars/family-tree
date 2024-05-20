@@ -1,8 +1,7 @@
 "use server"
 
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
-import { FamilyMember, FamilyMemberUpsert } from "@/common.types"
-import { TablesInsert } from "@/database.types"
+import { FamilyMember, FamilyMemberUpsert, RelationshipUpsert } from "@/common.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
@@ -101,7 +100,7 @@ async function upsert(node: FamilyMemberUpsert) {
 }
 
 export async function upsertEdges(
-  edges: TablesInsert<"family_member_relationships">[],
+  edges: RelationshipUpsert[],
   revalidatedPath?: string
 ) {
   const client = createClient()
@@ -174,7 +173,7 @@ export async function upsertChildsParents({
     throw Error("could not parse parents from form")
   }
 
-  let parentEdges: TablesInsert<"family_member_relationships">[] = []
+  let parentEdges: RelationshipUpsert[] = []
   parse.data.parents.forEach((pr) => {
     const [parent, relationship] = pr.split("-")
     const parentId = parseInt(parent, 10)

@@ -7,19 +7,19 @@ import {
   upsertParents,
   upsertPartnerRelationships,
 } from "@/app/actions"
-import { FamilyMember } from "@/common.types"
-import { Tables, TablesInsert } from "@/database.types"
-import { FullItem } from "vis-data/declarations/data-interface"
-import * as React from "react"
-import styles from "./MemberModal.module.css"
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
+import { FamilyMember, Relationship, RelationshipUpsert } from "@/common.types"
+import { Tables } from "@/database.types"
+import * as React from "react"
+import { FullItem } from "vis-data/declarations/data-interface"
+import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
 
 interface Props {
   onClose: () => void
   familyId: number
   node: FamilyMember
-  edges: Tables<"family_member_relationships">[]
+  edges: Relationship[]
   getRelationship: (id: number) => Tables<"relationship_types">
   getFamilyMember: (id: number) => FullItem<FamilyMember, "id"> | null
   mode?: number
@@ -428,7 +428,7 @@ export function ParentModal({
               formData.delete("death_date")
             }
             const parent = await upsertNode(formData)
-            const relationships: TablesInsert<"family_member_relationships">[] =
+            const relationships: RelationshipUpsert[] =
               [
                 {
                   family_id: familyId,
