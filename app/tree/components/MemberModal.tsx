@@ -7,6 +7,7 @@ import {
   upsertParents,
   upsertPartnerRelationships,
 } from "@/app/actions"
+import { FamilyMember } from "@/common.types"
 import { Tables, TablesInsert } from "@/database.types"
 import { FullItem } from "vis-data/declarations/data-interface"
 import * as React from "react"
@@ -17,18 +18,18 @@ import ModalWrapper from "./ModalWrapper"
 interface Props {
   onClose: () => void
   familyId: number
-  node: Tables<"family_members">
+  node: FamilyMember
   edges: Tables<"family_member_relationships">[]
   getRelationship: (id: number) => Tables<"relationship_types">
   getFamilyMember: (
     id: number
-  ) => FullItem<Tables<"family_members">, "id"> | null
+  ) => FullItem<FamilyMember, "id"> | null
   mode?: number
 }
 
 type CreateModalProps = Props & {
   setModalMode: (mode: number) => void
-  setNode: (node: Tables<"family_members">) => void
+  setNode: (node: FamilyMember) => void
 }
 
 const Mode = {
@@ -47,7 +48,7 @@ export function ReadMode({
   onClose,
   onSetMode,
 }: {
-  node: Tables<"family_members">
+  node: FamilyMember
   onClose: () => void
   onSetMode: (mode: number) => void
 }) {
@@ -89,9 +90,9 @@ export function EditMode({
   onSubmit,
 }: {
   familyId: number
-  node: Tables<"family_members">
+  node: FamilyMember
   onClose: () => void
-  onSubmit: (node: Tables<"family_members">) => void
+  onSubmit: (node: FamilyMember) => void
 }) {
   const formAction = async (formData: FormData) => {
     if (node.id) {
@@ -120,7 +121,7 @@ function Form({
   formAction,
 }: {
   children?: React.ReactNode
-  node?: Tables<"family_members">
+  node?: FamilyMember
   formAction: (formData: FormData) => void
 }) {
   return (
@@ -207,9 +208,9 @@ function PartnerSelection({
   setPartners,
   onClose,
 }: {
-  parent: FullItem<Tables<"family_members">, "id">
-  partners: FullItem<Tables<"family_members">, "id">[]
-  setPartners: (partners: FullItem<Tables<"family_members">, "id">[]) => void
+  parent: FullItem<FamilyMember, "id">
+  partners: FullItem<FamilyMember, "id">[]
+  setPartners: (partners: FullItem<FamilyMember, "id">[]) => void
   onClose: () => void
 }) {
   const [current, setCurrent] = React.useState(partners[0])
@@ -252,7 +253,7 @@ export function ChildMode({
   setModalMode,
   setNode,
 }: CreateModalProps) {
-  const tmp: FullItem<Tables<"family_members">, "id">[] = []
+  const tmp: FullItem<FamilyMember, "id">[] = []
   edges.forEach((edge) => {
     if (
       edge.from === node.id &&
@@ -399,7 +400,7 @@ export function ParentModal({
   getRelationship,
   getFamilyMember,
 }: CreateModalProps) {
-  const tmp: FullItem<Tables<"family_members">, "id">[] = []
+  const tmp: FullItem<FamilyMember, "id">[] = []
   edges.forEach((e) => {
     if (
       e.to === node.id &&
@@ -412,7 +413,7 @@ export function ParentModal({
     }
   })
 
-  const [parents, setParents] = React.useState<Tables<"family_members">[]>(tmp)
+  const [parents, setParents] = React.useState<FamilyMember[]>(tmp)
   if (parents.length < 2) {
     return (
       <div>
@@ -522,7 +523,7 @@ function Content({
 }: Props & {
   modalMode: number
   setModalMode: (mode: number) => void
-  setNode: (node: Tables<"family_members">) => void
+  setNode: (node: FamilyMember) => void
 }) {
   switch (modalMode) {
     case Mode.Read:

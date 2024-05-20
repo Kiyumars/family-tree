@@ -1,7 +1,8 @@
 "use server"
 
 import * as Relationship from "@/app/tree/components/Relationship"
-import { Tables, TablesInsert } from "@/database.types"
+import { FamilyMember, FamilyMemberUpsert } from "@/common.types"
+import { TablesInsert } from "@/database.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
@@ -87,7 +88,7 @@ export async function upsertNode(fd: FormData, revalidatedPath?: string) {
   return upserted
 }
 
-async function upsert(node: TablesInsert<"family_members">) {
+async function upsert(node: FamilyMemberUpsert) {
   const client = createClient()
   const { data, error } = await client
     .from("family_members")
@@ -118,7 +119,7 @@ export async function upsertEdges(
 export async function upsertParents(
   fd: FormData,
   familyId: number,
-  parents: Tables<"family_members">[],
+  parents: FamilyMember[],
   revalidatedPath?: string
 ) {
   const schema = z.object({

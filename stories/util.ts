@@ -1,4 +1,5 @@
 import { Node } from "@/app/tree/components/MembersGraph"
+import { FamilyMember } from "@/common.types"
 import { Tables } from "@/database.types"
 
 interface FakeMember {
@@ -26,8 +27,8 @@ export const fakeMember: Node = {
 
 export function createMembers(
   members: FakeMember[]
-): Tables<"family_members">[] {
-  let results: Tables<"family_members">[] = []
+): FamilyMember[] {
+  let results: FamilyMember[] = []
   for (let i = 1; i < members.length + 1; i++) {
     results.push({
       id: i,
