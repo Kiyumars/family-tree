@@ -1,6 +1,7 @@
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import {
   mapAdjencies,
+  mapFamilyMembers,
   mapRelationshipTypes,
   setHierarchies,
 } from "../utils/utils"
@@ -27,6 +28,7 @@ export default function Members({
     )
   }
 
+  const fmMap = mapFamilyMembers(familyMembers)
   const rtMap = mapRelationshipTypes(relationshipTypes)
   const adjMap = mapAdjencies(familyMembers, relationships, rtMap)
   const hierarchies = setHierarchies(familyMembers, adjMap)
@@ -41,7 +43,7 @@ export default function Members({
   return (
     <MembersGraph
       familyId={familyId}
-      familyMembers={familyMembers}
+      familyMembers={fmMap}
       nodes={nodes}
       edges={edges}
       relationships={relationships}

@@ -10,7 +10,6 @@ import {
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { FamilyMember, Relationship, RelationshipType, RelationshipUpsert } from "@/common.types"
 import * as React from "react"
-import { FullItem } from "vis-data/declarations/data-interface"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
 
@@ -20,7 +19,7 @@ interface Props {
   node: FamilyMember
   edges: Relationship[]
   getRelationship: (id: number) => RelationshipType
-  getFamilyMember: (id: number) => FullItem<FamilyMember, "id"> | null
+  getFamilyMember: (id: number) => FamilyMember
   mode?: number
 }
 
@@ -205,9 +204,9 @@ function PartnerSelection({
   setPartners,
   onClose,
 }: {
-  parent: FullItem<FamilyMember, "id">
-  partners: FullItem<FamilyMember, "id">[]
-  setPartners: (partners: FullItem<FamilyMember, "id">[]) => void
+  parent: FamilyMember
+  partners: FamilyMember[]
+  setPartners: (partners: FamilyMember[]) => void
   onClose: () => void
 }) {
   const [current, setCurrent] = React.useState(partners[0])
@@ -250,7 +249,7 @@ export function ChildMode({
   setModalMode,
   setNode,
 }: CreateModalProps) {
-  const tmp: FullItem<FamilyMember, "id">[] = []
+  const tmp: FamilyMember[] = []
   edges.forEach((edge) => {
     if (
       edge.from === node.id &&
@@ -397,7 +396,7 @@ export function ParentModal({
   getRelationship,
   getFamilyMember,
 }: CreateModalProps) {
-  const tmp: FullItem<FamilyMember, "id">[] = []
+  const tmp: FamilyMember[] = []
   edges.forEach((e) => {
     if (
       e.to === node.id &&

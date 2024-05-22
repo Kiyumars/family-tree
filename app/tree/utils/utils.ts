@@ -92,3 +92,11 @@ export function mapAdjencies(
   }
   return adjMap
 }
+
+export function mapFamilyMembers(familyMembers: FamilyMember[]) {
+  const m: Record<number, FamilyMember> = {}
+  familyMembers.forEach((fm) => {
+    m[fm.id] = fm
+  })
+  return m
+}
