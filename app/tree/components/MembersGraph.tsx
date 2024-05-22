@@ -28,7 +28,7 @@ export function MembersGraph({
   relationshipTypes,
   familyMembers,
 }: Props) {
-  const getRelationship = (id: number) => {
+  const getRelationshipType = (id: number) => {
     return relationshipTypes[id]
   }
   const getFamilyMember = (id: number) => {
@@ -46,7 +46,7 @@ export function MembersGraph({
           familyId={familyId}
           node={selected.node}
           edges={selected.relationships}
-          getRelationship={getRelationship}
+          getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           onClose={() => setSelected(undefined)}
         />

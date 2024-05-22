@@ -2,7 +2,7 @@ import MemberModal, { ParentModal } from "@/app/tree/components/MemberModal"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { Meta, StoryObj } from "@storybook/react"
-import { createMembers, fakeGetRelationship } from "../util"
+import { createMembers, fakeGetRelationshipType } from "../util"
 
 const meta: Meta<typeof MemberModal> = {
   component: MemberModal,
@@ -31,7 +31,7 @@ export const CreateParentFirstScreen: Story = {
             node={nodes[0]}
             edges={[]}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
+            getRelationshipType={fakeGetRelationshipType}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
@@ -81,7 +81,7 @@ export const CreateParentSecondScreen: Story = {
               },
             ]}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
+            getRelationshipType={fakeGetRelationshipType}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
@@ -145,7 +145,7 @@ export const CreateParentThirdScreen: Story = {
               },
             ]}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
+            getRelationshipType={fakeGetRelationshipType}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}

@@ -2,7 +2,7 @@ import MemberModal, { ChildMode } from "@/app/tree/components/MemberModal"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { Meta, StoryObj } from "@storybook/react"
-import { createMembers, fakeGetRelationship } from "../util"
+import { createMembers, fakeGetRelationshipType } from "../util"
 
 const meta: Meta<typeof MemberModal> = {
   component: MemberModal,
@@ -44,7 +44,7 @@ export const CreateChildWithTwoParents: Story = {
             node={members[0]}
             edges={edges}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
+            getRelationshipType={fakeGetRelationshipType}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
@@ -104,7 +104,7 @@ export const CreateChildWithMultiplePossibleParents: Story = {
             node={members[0]}
             edges={edges}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
+            getRelationshipType={fakeGetRelationshipType}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
@@ -132,7 +132,7 @@ export const CreateChildWithOneParent: Story = {
             node={members[0]}
             edges={[]}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
+            getRelationshipType={fakeGetRelationshipType}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}

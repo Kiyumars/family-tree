@@ -20,9 +20,7 @@ export const fakeMember: FamilyMember = {
   gender: "male",
 }
 
-export function createMembers(
-  members: FakeMember[]
-): FamilyMember[] {
+export function createMembers(members: FakeMember[]): FamilyMember[] {
   return members.map((m, i) => {
     return {
       id: i + 1,
@@ -35,11 +33,12 @@ export function createMembers(
       created_at: Date(),
       profession: null,
       death_date: null,
-      gender: "m",    }
+      gender: "m",
+    }
   })
 }
 
-export function fakeGetRelationship(id: number) {
+export function fakeGetRelationshipType(id: number) {
   const rtMap: Record<number, RelationshipType> = {
     1: { id: 1, type: "partner", subtype: "married" },
     2: { id: 2, type: "partner", subtype: "unmarried" },
