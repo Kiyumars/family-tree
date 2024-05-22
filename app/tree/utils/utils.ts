@@ -1,6 +1,6 @@
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 
-interface Adjacencies {
+export interface Adjacencies {
   partners: Set<number>
   children: Set<number>
   parents: Set<number>
