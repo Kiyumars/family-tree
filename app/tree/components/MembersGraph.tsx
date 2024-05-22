@@ -2,7 +2,7 @@
 
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import * as React from "react"
-import VisGraph, { Node } from "react-vis-graph-wrapper"
+import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
@@ -11,7 +11,8 @@ interface Props {
   familyId: number
   familyMembers: FamilyMember[]
   nodes: Node[]
-  edges: Relationship[]
+  edges: Edge[]
+  relationships: Relationship[]
   relationshipTypes: Record<number, RelationshipType>
 }
 
@@ -24,6 +25,7 @@ export function MembersGraph({
   nodes,
   edges,
   familyId,
+  relationships,
   relationshipTypes,
   familyMembers
 }: Props) {
@@ -31,7 +33,7 @@ export function MembersGraph({
     return relationshipTypes[id]
   }
   const fmSet = new DataSet(familyMembers)
-  const edgeSet = new DataSet(edges)
+  const rSet = new DataSet(relationships)
   const getFamilyMember = (id: number) => {
     return fmSet.get(id)
   }
@@ -82,10 +84,10 @@ export function MembersGraph({
                 event.nodes[0]
               ) as unknown as FullItem<FamilyMember, "id">
               if (selectedNode) {
-                const connectedEdges = edgeSet.get(event.edges)
+                const connectedRelationships = rSet.get(event.edges)
                 setSelected({
                   node: selectedNode,
-                  relationships: connectedEdges,
+                  relationships: connectedRelationships,
                 })
               }
             }

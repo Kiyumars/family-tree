@@ -37,12 +37,14 @@ export default function Members({
       level: hierarchies[member.id],
     }
   })
+  const edges = [...relationships]
   return (
     <MembersGraph
       familyId={familyId}
       familyMembers={familyMembers}
       nodes={nodes}
-      edges={relationships}
+      edges={edges}
+      relationships={relationships}
       relationshipTypes={rtMap}
     />
   )
