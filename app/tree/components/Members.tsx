@@ -1,5 +1,9 @@
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
-import { setHierarchies } from "../utils/utils"
+import {
+  mapAdjencies,
+  mapRelationshipTypes,
+  setHierarchies,
+} from "../utils/utils"
 import MembersGraph from "./MembersGraph"
 
 interface Props {
@@ -23,18 +27,9 @@ export default function Members({
     )
   }
 
-  const rtMap: Record<number, RelationshipType> = {}
-  relationshipTypes.forEach((rt) => {
-    rtMap[rt.id] = rt
-  })
-  const getRelationship = (id: number) => {
-    return rtMap[id]
-  }
-  const hierarchies = setHierarchies(
-    familyMembers,
-    relationships,
-    getRelationship
-  )
+  const rtMap = mapRelationshipTypes(relationshipTypes)
+  const adjMap = mapAdjencies(familyMembers, relationships, rtMap)
+  const hierarchies = setHierarchies(familyMembers, adjMap)
   const nodes = familyMembers.map((member) => {
     return {
       label: `${member.first_name} ${member.second_name}`,
