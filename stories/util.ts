@@ -1,4 +1,3 @@
-import { Node } from "@/app/tree/components/MembersGraph"
 import { FamilyMember, RelationshipType } from "@/common.types"
 
 interface FakeMember {
@@ -6,7 +5,7 @@ interface FakeMember {
   second_name: string
 }
 
-export const fakeMember: Node = {
+export const fakeMember: FamilyMember = {
   id: 1,
   created_at: "2024-05-01",
   family_id: 1,
@@ -19,31 +18,25 @@ export const fakeMember: Node = {
   biography:
     "Short king impresses an Austrian socialite by taking over Europe.",
   gender: "male",
-  title: "Napoleon Bonaparte",
-  label: "Napoleon Bonaparte",
-  level: 0,
 }
 
 export function createMembers(
   members: FakeMember[]
 ): FamilyMember[] {
-  let results: FamilyMember[] = []
-  for (let i = 1; i < members.length + 1; i++) {
-    results.push({
-      id: i,
+  return members.map((m, i) => {
+    return {
+      id: i + 1,
       uuid: (Math.random() + 1).toString(36).substring(7),
       family_id: i,
       birth_date: Date(),
-      first_name: members[i - 1].first_name,
-      second_name: members[i - 1].second_name,
+      first_name: m.first_name,
+      second_name: m.second_name,
       biography: null,
       created_at: Date(),
       profession: null,
       death_date: null,
-      gender: "m",
-    })
-  }
-  return results
+      gender: "m",    }
+  })
 }
 
 export function fakeGetRelationship(id: number) {

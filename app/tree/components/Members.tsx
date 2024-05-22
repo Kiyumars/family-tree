@@ -32,14 +32,15 @@ export default function Members({
   const hierarchies = setHierarchies(familyMembers, adjMap)
   const nodes = familyMembers.map((member) => {
     return {
+      id: member.id,
       label: `${member.first_name} ${member.second_name}`,
       level: hierarchies[member.id],
-      ...member,
     }
   })
   return (
     <MembersGraph
       familyId={familyId}
+      familyMembers={familyMembers}
       nodes={nodes}
       edges={relationships}
       relationshipTypes={rtMap}

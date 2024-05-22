@@ -2,14 +2,15 @@
 
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import * as React from "react"
-import VisGraph from "react-vis-graph-wrapper"
+import VisGraph, { Node } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
 
 interface Props {
   familyId: number
-  nodes: FamilyMember[]
+  familyMembers: FamilyMember[]
+  nodes: Node[]
   edges: Relationship[]
   relationshipTypes: Record<number, RelationshipType>
 }
@@ -19,25 +20,20 @@ interface SelectedProps {
   relationships: Relationship[]
 }
 
-export type Node = FamilyMember & {
-  label: string
-  title: string
-  level: number
-}
-
 export function MembersGraph({
   nodes,
   edges,
   familyId,
   relationshipTypes,
+  familyMembers
 }: Props) {
   const getRelationship = (id: number) => {
     return relationshipTypes[id]
   }
-  const nodeSet = new DataSet(nodes)
+  const fmSet = new DataSet(familyMembers)
   const edgeSet = new DataSet(edges)
   const getFamilyMember = (id: number) => {
-    return nodeSet.get(id)
+    return fmSet.get(id)
   }
 
   const [selected, setSelected] = React.useState<SelectedProps | undefined>(
@@ -82,9 +78,9 @@ export function MembersGraph({
         events={{
           selectNode: (event: any) => {
             if (event.nodes.length === 1) {
-              const selectedNode = nodeSet.get(
+              const selectedNode = fmSet.get(
                 event.nodes[0]
-              ) as unknown as FullItem<Node, "id">
+              ) as unknown as FullItem<FamilyMember, "id">
               if (selectedNode) {
                 const connectedEdges = edgeSet.get(event.edges)
                 setSelected({
