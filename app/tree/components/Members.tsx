@@ -47,8 +47,6 @@ export default function Members({
       nodes={nodes}
       edges={edges}
       adjacenciesMap={adjMap}
-      relationships={relationships}
-      relationshipTypes={rtMap}
     />
   )
 }

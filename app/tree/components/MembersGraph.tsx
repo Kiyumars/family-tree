@@ -13,8 +13,6 @@ interface Props {
   nodes: Node[]
   edges: Edge[]
   adjacenciesMap: Record<number, Adjacencies>
-  relationships: Relationship[]
-  relationshipTypes: Record<number, RelationshipType>
 }
 
 export function MembersGraph({
@@ -22,8 +20,6 @@ export function MembersGraph({
   nodes,
   edges,
   familyId,
-  relationships,
-  relationshipTypes,
   familyMembers,
 }: Props) {
   const getRelationships = (id: number) => {
