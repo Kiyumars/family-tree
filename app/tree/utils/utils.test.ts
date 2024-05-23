@@ -2,23 +2,7 @@ import { RelationshipType } from "@/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { createMembers } from "../../../stories/util"
-import { Adjacencies, setHierarchies } from "./utils"
-
-function createAdjaciencies(props: {
-  parents?: number[]
-  children?: number[]
-  partners?: number[]
-}) {
-  const adjencies: Adjacencies = {
-    parents: new Set(),
-    children: new Set(),
-    partners: new Set(),
-  }
-  props.children?.forEach((a) => adjencies.children.add(a))
-  props.parents?.forEach((a) => adjencies.parents.add(a))
-  props.partners?.forEach((a) => adjencies.partners.add(a))
-  return adjencies
-}
+import { Adjacencies, createAdjaciencies, setHierarchies } from "./utils"
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {
