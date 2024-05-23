@@ -17,11 +17,6 @@ interface Props {
   relationshipTypes: Record<number, RelationshipType>
 }
 
-interface SelectedProps {
-  node: FamilyMember
-  relationships: Relationship[]
-}
-
 export function MembersGraph({
   adjacenciesMap,
   nodes,
@@ -40,9 +35,7 @@ export function MembersGraph({
   const getFamilyMember = (id: number) => {
     return familyMembers[id]
   }
-  const rSet = new DataSet(relationships)
-
-  const [selected, setSelected] = React.useState<SelectedProps | undefined>(
+  const [selected, setSelected] = React.useState<FamilyMember | undefined>(
     undefined
   )
   return (
@@ -50,8 +43,7 @@ export function MembersGraph({
       {selected && (
         <MemberModal
           familyId={familyId}
-          node={selected.node}
-          edges={selected.relationships}
+          node={selected}
           getRelationships={getRelationships}
           getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
@@ -85,11 +77,7 @@ export function MembersGraph({
         events={{
           selectNode: (event: any) => {
             const selectedNode = getFamilyMember(event.nodes[0])
-            const connectedRelationships = rSet.get(event.edges)
-            setSelected({
-              node: selectedNode,
-              relationships: connectedRelationships,
-            })
+            setSelected(selectedNode)
           },
         }}
         // ref={(network: Network) => {

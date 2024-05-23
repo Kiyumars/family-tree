@@ -23,7 +23,6 @@ interface Props {
   onClose: () => void
   familyId: number
   node: FamilyMember
-  edges: Relationship[]
   getRelationships: (id: number) => Adjacencies
   getRelationshipType: (id: number) => RelationshipType
   getFamilyMember: (id: number) => FamilyMember
@@ -249,7 +248,6 @@ function PartnerSelection({
 export function ChildMode({
   node,
   familyId,
-  edges,
   getRelationshipType,
   getFamilyMember,
   getRelationships,
@@ -391,7 +389,6 @@ export function ParentModal({
   familyId,
   node,
   onClose,
-  edges,
   getRelationshipType,
   getFamilyMember,
   getRelationships,
@@ -466,7 +463,6 @@ export default function MemberModal({
   onClose,
   familyId,
   node,
-  edges = [],
   getRelationships,
   getRelationshipType,
   getFamilyMember,
@@ -479,7 +475,6 @@ export default function MemberModal({
       <Content
         modalMode={modalMode}
         node={n}
-        edges={edges}
         familyId={familyId}
         setModalMode={setModalMode}
         setNode={setNode}
@@ -496,7 +491,6 @@ function Content({
   familyId,
   modalMode,
   node,
-  edges,
   onClose,
   setModalMode,
   setNode,
@@ -528,7 +522,6 @@ function Content({
         <ChildMode
           familyId={familyId}
           node={node}
-          edges={edges}
           getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           onClose={onClose}
@@ -552,7 +545,6 @@ function Content({
         <ParentModal
           familyId={familyId}
           node={node}
-          edges={edges}
           getRelationships={getRelationships}
           getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
