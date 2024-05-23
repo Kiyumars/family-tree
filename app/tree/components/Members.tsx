@@ -46,6 +46,7 @@ export default function Members({
       familyMembers={fmMap}
       nodes={nodes}
       edges={edges}
+      adjacenciesMap={adjMap}
       relationships={relationships}
       relationshipTypes={rtMap}
     />

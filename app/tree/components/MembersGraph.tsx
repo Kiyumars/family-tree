@@ -5,12 +5,14 @@ import * as React from "react"
 import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import MemberModal from "./MemberModal"
+import { Adjacencies } from "../utils/utils"
 
 interface Props {
   familyId: number
   familyMembers: Record<number, FamilyMember>
   nodes: Node[]
   edges: Edge[]
+  adjacenciesMap: Record<number, Adjacencies>
   relationships: Relationship[]
   relationshipTypes: Record<number, RelationshipType>
 }
@@ -21,6 +23,7 @@ interface SelectedProps {
 }
 
 export function MembersGraph({
+  adjacenciesMap,
   nodes,
   edges,
   familyId,
@@ -28,6 +31,9 @@ export function MembersGraph({
   relationshipTypes,
   familyMembers,
 }: Props) {
+  const getRelationships = (id: number) => {
+    return adjacenciesMap[id]
+  }
   const getRelationshipType = (id: number) => {
     return relationshipTypes[id]
   }
@@ -46,6 +52,7 @@ export function MembersGraph({
           familyId={familyId}
           node={selected.node}
           edges={selected.relationships}
+          getRelationships={getRelationships}
           getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           onClose={() => setSelected(undefined)}

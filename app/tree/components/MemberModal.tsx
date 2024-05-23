@@ -17,12 +17,14 @@ import {
 import * as React from "react"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
+import { Adjacencies } from "../utils/utils"
 
 interface Props {
   onClose: () => void
   familyId: number
   node: FamilyMember
   edges: Relationship[]
+  getRelationships: (id: number) => Adjacencies
   getRelationshipType: (id: number) => RelationshipType
   getFamilyMember: (id: number) => FamilyMember
   mode?: number
@@ -250,21 +252,14 @@ export function ChildMode({
   edges,
   getRelationshipType,
   getFamilyMember,
+  getRelationships,
   onClose,
   setModalMode,
   setNode,
 }: CreateModalProps) {
   const tmp: FamilyMember[] = []
-  edges.forEach((edge) => {
-    if (
-      edge.from === node.id &&
-      getRelationshipType(edge.relationship_type).type === "partner"
-    ) {
-      const partner = getFamilyMember(edge.to)
-      if (partner) {
-        tmp.push(partner)
-      }
-    }
+  getRelationships(node.id).partners.forEach((p) => {
+    tmp.push(getFamilyMember(p))
   })
   const [partners, setPartners] = React.useState(tmp)
 
@@ -353,7 +348,7 @@ export function PartnerModal({
   setModalMode,
 }: Omit<
   CreateModalProps,
-  "edges" | "getRelationshipType" | "getFamilyMember"
+  "edges" | "getRelationshipType" | "getFamilyMember" | "getRelationships"
 >) {
   return (
     <div>
@@ -399,20 +394,10 @@ export function ParentModal({
   edges,
   getRelationshipType,
   getFamilyMember,
+  getRelationships,
 }: CreateModalProps) {
   const tmp: FamilyMember[] = []
-  edges.forEach((e) => {
-    if (
-      e.to === node.id &&
-      getRelationshipType(e.relationship_type).type === "parent"
-    ) {
-      const parent = getFamilyMember(e.from)
-      if (parent) {
-        tmp.push(parent)
-      }
-    }
-  })
-
+  getRelationships(node.id).parents.forEach((p) => tmp.push(getFamilyMember(p)))
   const [parents, setParents] = React.useState<FamilyMember[]>(tmp)
   if (parents.length < 2) {
     return (
@@ -482,6 +467,7 @@ export default function MemberModal({
   familyId,
   node,
   edges = [],
+  getRelationships,
   getRelationshipType,
   getFamilyMember,
   mode = Mode.Read,
@@ -497,6 +483,7 @@ export default function MemberModal({
         familyId={familyId}
         setModalMode={setModalMode}
         setNode={setNode}
+        getRelationships={getRelationships}
         getRelationshipType={getRelationshipType}
         getFamilyMember={getFamilyMember}
         onClose={onClose}
@@ -515,6 +502,7 @@ function Content({
   setNode,
   getRelationshipType,
   getFamilyMember,
+  getRelationships,
 }: Props & {
   modalMode: number
   setModalMode: (mode: number) => void
@@ -546,6 +534,7 @@ function Content({
           onClose={onClose}
           setNode={setNode}
           setModalMode={setModalMode}
+          getRelationships={getRelationships}
         />
       )
     case Mode.Create.Partner:
@@ -564,6 +553,7 @@ function Content({
           familyId={familyId}
           node={node}
           edges={edges}
+          getRelationships={getRelationships}
           getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           setModalMode={setModalMode}
