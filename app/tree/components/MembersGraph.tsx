@@ -29,9 +29,6 @@ export function MembersGraph({
   const getRelationships = (id: number) => {
     return adjacenciesMap[id]
   }
-  const getRelationshipType = (id: number) => {
-    return relationshipTypes[id]
-  }
   const getFamilyMember = (id: number) => {
     return familyMembers[id]
   }
@@ -45,7 +42,6 @@ export function MembersGraph({
           familyId={familyId}
           node={selected}
           getRelationships={getRelationships}
-          getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           onClose={() => setSelected(undefined)}
         />

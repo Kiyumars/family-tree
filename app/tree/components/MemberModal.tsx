@@ -24,7 +24,6 @@ interface Props {
   familyId: number
   node: FamilyMember
   getRelationships: (id: number) => Adjacencies
-  getRelationshipType: (id: number) => RelationshipType
   getFamilyMember: (id: number) => FamilyMember
   mode?: number
 }
@@ -248,7 +247,6 @@ function PartnerSelection({
 export function ChildMode({
   node,
   familyId,
-  getRelationshipType,
   getFamilyMember,
   getRelationships,
   onClose,
@@ -389,7 +387,6 @@ export function ParentModal({
   familyId,
   node,
   onClose,
-  getRelationshipType,
   getFamilyMember,
   getRelationships,
 }: CreateModalProps) {
@@ -464,7 +461,6 @@ export default function MemberModal({
   familyId,
   node,
   getRelationships,
-  getRelationshipType,
   getFamilyMember,
   mode = Mode.Read,
 }: Props) {
@@ -479,7 +475,6 @@ export default function MemberModal({
         setModalMode={setModalMode}
         setNode={setNode}
         getRelationships={getRelationships}
-        getRelationshipType={getRelationshipType}
         getFamilyMember={getFamilyMember}
         onClose={onClose}
       />
@@ -494,7 +489,6 @@ function Content({
   onClose,
   setModalMode,
   setNode,
-  getRelationshipType,
   getFamilyMember,
   getRelationships,
 }: Props & {
@@ -522,7 +516,6 @@ function Content({
         <ChildMode
           familyId={familyId}
           node={node}
-          getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           onClose={onClose}
           setNode={setNode}
@@ -546,7 +539,6 @@ function Content({
           familyId={familyId}
           node={node}
           getRelationships={getRelationships}
-          getRelationshipType={getRelationshipType}
           getFamilyMember={getFamilyMember}
           setModalMode={setModalMode}
           onClose={onClose}
