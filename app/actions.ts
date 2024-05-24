@@ -1,7 +1,12 @@
 "use server"
 
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
-import { FamilyMember, FamilyMemberUpsert, RelationshipUpsert } from "@/common.types"
+import {
+  FamilyMember,
+  FamilyMemberUpsert,
+  RelationshipType,
+  RelationshipUpsert
+} from "@/common.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
@@ -115,10 +120,10 @@ export async function upsertEdges(
   return data
 }
 
-export async function upsertParents(
+export async function upsertRelationship(
   fd: FormData,
   familyId: number,
-  parents: FamilyMember[],
+  familyMembers: FamilyMember[],
   revalidatedPath?: string
 ) {
   const schema = z.object({
@@ -130,21 +135,21 @@ export async function upsertParents(
   if (!relationship.success) {
     throw relationship.error
   }
-  if (parents.length != 2) {
+  if (familyMembers.length != 2) {
     throw new Error("parents do not have length 2")
   }
   await upsertEdges(
     [
       {
         family_id: familyId,
-        from: parents[0].id,
-        to: parents[1].id,
+        from: familyMembers[0].id,
+        to: familyMembers[1].id,
         relationship_type: relationship.data.id,
       },
       {
         family_id: familyId,
-        from: parents[1].id,
-        to: parents[0].id,
+        from: familyMembers[1].id,
+        to: familyMembers[0].id,
         relationship_type: relationship.data.id,
       },
     ],
