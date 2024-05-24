@@ -1,53 +1,33 @@
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 
-type Hash = Record<
-  number,
-  {
-    parents: number[]
-    children: number[]
-    partners: number[]
-    level?: number
-  }
->
+export interface Adjacencies {
+  partners: Set<number>
+  children: Set<number>
+  parents: Set<number>
+}
 
 export function setHierarchies(
   nodes: FamilyMember[],
-  edges: Relationship[],
-  getRelationship: (id: number) => RelationshipType
+  adjMap: Record<number, Adjacencies>
 ): Record<number, number> {
-  const hash: Hash = {}
-  for (let i = 0; i < nodes.length; i++) {
-    hash[nodes[i].id] = { parents: [], children: [], partners: [] }
-  }
-  for (let i = 0; i < edges.length; i++) {
-    const { from, to, relationship_type } = edges[i]
-    switch (getRelationship(relationship_type).type) {
-      case "parent":
-        hash[from].children.push(to)
-      case "child":
-        hash[from].parents.push(to)
-      case "partner":
-        hash[from].partners.push(to)
-    }
-  }
-
+  const hierarchies: Record<number, number> = {}
   let stack: [number, number][] = []
   function bfs(id: number, level: number) {
-    if (hash[id].level != undefined) {
+    if (hierarchies[id] !== undefined) {
       return
     }
-    hash[id].level = level
-    hash[id].children.forEach(
+    hierarchies[id] = level
+    adjMap[id].children.forEach(
       (child) =>
-        hash[child].level === undefined && stack.push([child, level + 1])
+        hierarchies[child] === undefined && stack.push([child, level + 1])
     )
-    hash[id].parents.forEach(
+    adjMap[id].parents.forEach(
       (parent) =>
-        hash[parent].level === undefined && stack.push([parent, level - 1])
+        hierarchies[parent] === undefined && stack.push([parent, level - 1])
     )
-    hash[id].partners.forEach(
+    adjMap[id].partners.forEach(
       (partner) =>
-        hash[partner].level === undefined && stack.push([partner, level])
+        hierarchies[partner] === undefined && stack.push([partner, level])
     )
   }
 
@@ -62,10 +42,9 @@ export function setHierarchies(
     }
   }
 
-  const hierarchies: Record<number, number> = {}
   for (let i = 0; i < nodes.length; i++) {
     const id = nodes[i].id
-    const level = hash[id]?.level
+    const level = hierarchies[id]
     if (level !== undefined) {
       hierarchies[id] = level
     } else {
@@ -74,4 +53,61 @@ export function setHierarchies(
   }
 
   return hierarchies
+}
+
+export function mapRelationshipTypes(rts: RelationshipType[]) {
+  const m: Record<number, RelationshipType> = {}
+  rts.forEach((r) => {
+    m[r.id] = r
+  })
+  return m
+}
+
+export function mapAdjencies(
+  familyMembers: FamilyMember[],
+  relationships: Relationship[],
+  relationshipTypes: Record<number, RelationshipType>
+) {
+  const adjMap: Record<number, Adjacencies> = {}
+  familyMembers.forEach((fm) => {
+    adjMap[fm.id] = createAdjaciencies({})
+  })
+  relationships.forEach(({ from, to, relationship_type }) => {
+    switch (relationshipTypes[relationship_type].type) {
+      case "parent":
+        adjMap[from].children.add(to)
+        break
+      case "child":
+        adjMap[from].parents.add(to)
+        break
+      case "partner":
+        adjMap[from].partners.add(to)
+        break
+    }
+  })
+  return adjMap
+}
+
+export function mapFamilyMembers(familyMembers: FamilyMember[]) {
+  const m: Record<number, FamilyMember> = {}
+  familyMembers.forEach((fm) => {
+    m[fm.id] = fm
+  })
+  return m
+}
+
+export function createAdjaciencies(props: {
+  parents?: number[]
+  children?: number[]
+  partners?: number[]
+}) {
+  const adjencies: Adjacencies = {
+    parents: new Set(),
+    children: new Set(),
+    partners: new Set(),
+  }
+  props.children?.forEach((a) => adjencies.children.add(a))
+  props.parents?.forEach((b) => adjencies.parents.add(b))
+  props.partners?.forEach((c) => adjencies.partners.add(c))
+  return adjencies
 }

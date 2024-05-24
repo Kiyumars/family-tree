@@ -2,45 +2,33 @@
 
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import * as React from "react"
-import VisGraph from "react-vis-graph-wrapper"
+import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
-import { FullItem } from "vis-data/declarations/data-interface"
 import MemberModal from "./MemberModal"
+import { Adjacencies } from "../utils/utils"
 
 interface Props {
   familyId: number
-  nodes: FamilyMember[]
-  edges: Relationship[]
-  relationshipTypes: Record<number, RelationshipType>
-}
-
-interface SelectedProps {
-  node: FamilyMember
-  relationships: Relationship[]
-}
-
-export type Node = FamilyMember & {
-  label: string
-  title: string
-  level: number
+  familyMembers: Record<number, FamilyMember>
+  nodes: Node[]
+  edges: Edge[]
+  adjacenciesMap: Record<number, Adjacencies>
 }
 
 export function MembersGraph({
+  adjacenciesMap,
   nodes,
   edges,
   familyId,
-  relationshipTypes,
+  familyMembers,
 }: Props) {
-  const getRelationship = (id: number) => {
-    return relationshipTypes[id]
+  const getRelationships = (id: number) => {
+    return adjacenciesMap[id]
   }
-  const nodeSet = new DataSet(nodes)
-  const edgeSet = new DataSet(edges)
   const getFamilyMember = (id: number) => {
-    return nodeSet.get(id)
+    return familyMembers[id]
   }
-
-  const [selected, setSelected] = React.useState<SelectedProps | undefined>(
+  const [selected, setSelected] = React.useState<FamilyMember | undefined>(
     undefined
   )
   return (
@@ -48,9 +36,8 @@ export function MembersGraph({
       {selected && (
         <MemberModal
           familyId={familyId}
-          node={selected.node}
-          edges={selected.relationships}
-          getRelationship={getRelationship}
+          node={selected}
+          getRelationships={getRelationships}
           getFamilyMember={getFamilyMember}
           onClose={() => setSelected(undefined)}
         />
@@ -81,18 +68,8 @@ export function MembersGraph({
         }}
         events={{
           selectNode: (event: any) => {
-            if (event.nodes.length === 1) {
-              const selectedNode = nodeSet.get(
-                event.nodes[0]
-              ) as unknown as FullItem<Node, "id">
-              if (selectedNode) {
-                const connectedEdges = edgeSet.get(event.edges)
-                setSelected({
-                  node: selectedNode,
-                  relationships: connectedEdges,
-                })
-              }
-            }
+            const selectedNode = getFamilyMember(event.nodes[0])
+            setSelected(selectedNode)
           },
         }}
         // ref={(network: Network) => {

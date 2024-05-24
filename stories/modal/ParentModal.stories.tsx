@@ -2,7 +2,8 @@ import MemberModal, { ParentModal } from "@/app/tree/components/MemberModal"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
 import RelationshipIds from "@/app/tree/components/RelationshipIds"
 import { Meta, StoryObj } from "@storybook/react"
-import { createMembers, fakeGetRelationship } from "../util"
+import { createMembers } from "../util"
+import { Adjacencies, createAdjaciencies } from "@/app/tree/utils/utils"
 
 const meta: Meta<typeof MemberModal> = {
   component: MemberModal,
@@ -13,25 +14,27 @@ type Story = StoryObj<typeof MemberModal>
 
 export const CreateParentFirstScreen: Story = {
   render: () => {
-    const nodes = createMembers([
-      { first_name: "Child", second_name: "O'Parent" },
-    ])
     const members = createMembers([
+      { first_name: "Child", second_name: "O'Parent" },
+
       { first_name: "Parent", second_name: "One" },
       { first_name: "Parent", second_name: "Two" },
     ])
     const getFamilyMember = (id: number) => {
       return members[id - 1]
     }
+    const adjMap: Record<number, Adjacencies> = { 1: createAdjaciencies({}) }
+    const getRelationships = (id: number) => {
+      return adjMap[id]
+    }
 
     return (
       <div id="modal-root">
         <ModalWrapper>
           <ParentModal
-            node={nodes[0]}
-            edges={[]}
+            node={members[0]}
+            getRelationships={getRelationships}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
@@ -45,11 +48,7 @@ export const CreateParentFirstScreen: Story = {
 
 export const CreateParentSecondScreen: Story = {
   render: () => {
-    const nodes = createMembers([
-      { first_name: "Child", second_name: "O'Parent" },
-    ])
     const members = createMembers([
-      // fake entry for id
       { first_name: "Child", second_name: "O'Parent" },
 
       { first_name: "Parent", second_name: "One" },
@@ -58,30 +57,21 @@ export const CreateParentSecondScreen: Story = {
     const getFamilyMember = (id: number) => {
       return members[id - 1]
     }
+    const adjMap: Record<number, Adjacencies> = {
+      1: createAdjaciencies({ parents: [2] }),
+      2: createAdjaciencies({ children: [1] }),
+    }
+    const getRelationships = (id: number) => {
+      return adjMap[id]
+    }
 
     return (
       <div id="modal-root">
         <ModalWrapper>
           <ParentModal
-            node={nodes[0]}
-            edges={[
-              {
-                id: 1,
-                family_id: 1,
-                from: 1,
-                to: 2,
-                relationship_type: RelationshipIds.Child.Adopted,
-              },
-              {
-                id: 2,
-                family_id: 1,
-                from: 2,
-                to: 1,
-                relationship_type: RelationshipIds.Parent.Biological,
-              },
-            ]}
+            node={members[0]}
+            getRelationships={getRelationships}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
@@ -95,11 +85,7 @@ export const CreateParentSecondScreen: Story = {
 
 export const CreateParentThirdScreen: Story = {
   render: () => {
-    const nodes = createMembers([
-      { first_name: "Child", second_name: "O'Parent" },
-    ])
     const members = createMembers([
-      // fake entry for id
       { first_name: "Child", second_name: "O'Parent" },
 
       { first_name: "Parent", second_name: "One" },
@@ -109,43 +95,22 @@ export const CreateParentThirdScreen: Story = {
       return members[id - 1]
     }
 
+    const adjMap: Record<number, Adjacencies> = {
+      1: createAdjaciencies({ parents: [2, 3] }),
+      2: createAdjaciencies({ children: [1], partners: [3] }),
+      3: createAdjaciencies({ children: [1], partners: [2] }),
+    }
+    const getRelationships = (id: number) => {
+      return adjMap[id]
+    }
+
     return (
       <div id="modal-root">
         <ModalWrapper>
           <ParentModal
-            node={nodes[0]}
-            edges={[
-              {
-                id: 1,
-                family_id: 1,
-                from: 1,
-                to: 2,
-                relationship_type: RelationshipIds.Child.Adopted,
-              },
-              {
-                id: 2,
-                family_id: 1,
-                from: 2,
-                to: 1,
-                relationship_type: RelationshipIds.Parent.Biological,
-              },
-              {
-                id: 3,
-                family_id: 1,
-                from: 3,
-                to: 1,
-                relationship_type: RelationshipIds.Parent.Biological,
-              },
-              {
-                id: 4,
-                family_id: 1,
-                from: 1,
-                to: 3,
-                relationship_type: RelationshipIds.Child.Biological,
-              },
-            ]}
+            node={members[0]}
+            getRelationships={getRelationships}
             getFamilyMember={getFamilyMember}
-            getRelationship={fakeGetRelationship}
             onClose={() => {}}
             familyId={1}
             setModalMode={() => {}}
