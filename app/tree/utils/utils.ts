@@ -1,4 +1,5 @@
 import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
+import { rtMap } from "../components/RelationshipTypes"
 
 export interface Adjacencies {
   partners: Set<number>
@@ -65,15 +66,14 @@ export function mapRelationshipTypes(rts: RelationshipType[]) {
 
 export function mapAdjencies(
   familyMembers: FamilyMember[],
-  relationships: Relationship[],
-  relationshipTypes: Record<number, RelationshipType>
+  relationships: Relationship[]
 ) {
   const adjMap: Record<number, Adjacencies> = {}
   familyMembers.forEach((fm) => {
     adjMap[fm.id] = createAdjaciencies({})
   })
   relationships.forEach(({ from, to, relationship_type }) => {
-    switch (relationshipTypes[relationship_type].type) {
+    switch (rtMap[relationship_type].type) {
       case "parent":
         adjMap[from].children.add(to)
         break

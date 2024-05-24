@@ -1,10 +1,9 @@
 "use server"
 
-import RelationshipIds from "@/app/tree/components/RelationshipIds"
+import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
 import {
   FamilyMember,
   FamilyMemberUpsert,
-  RelationshipType,
   RelationshipUpsert
 } from "@/common.types"
 import { createClient } from "@/utils/supabase/server"
@@ -24,22 +23,17 @@ export async function fetchTreeData(familyId: number) {
     .from("family_member_relationships")
     .select()
     .eq("family_id", familyId)
-  const fetchRelationshipTypes = client.from("relationship_types").select()
 
-  const [membersRes, relationshipsRes, relationshipTypesRes] =
+  const [membersRes, relationshipsRes] =
     await Promise.all([
       fetchMembers,
       fetchRelationships,
-      fetchRelationshipTypes,
     ])
   if (membersRes.error) {
     throw new Error(membersRes.error.message)
   }
   if (relationshipsRes.error) {
     throw new Error(relationshipsRes.error.message)
-  }
-  if (relationshipTypesRes.error) {
-    throw new Error(relationshipTypesRes.error.message)
   }
   if (!membersRes.data?.length) {
     const familyExists = await checkFamily(client, familyId)
@@ -48,7 +42,7 @@ export async function fetchTreeData(familyId: number) {
     }
   }
 
-  return { membersRes, relationshipsRes, relationshipTypesRes }
+  return { membersRes, relationshipsRes }
 }
 
 export async function checkFamily(
@@ -191,9 +185,9 @@ export async function upsertChildsParents({
       from: childId,
       to: parentId,
       relationship_type:
-        relationshipId === RelationshipIds.Parent.Adopted
-          ? RelationshipIds.Child.Adopted
-          : RelationshipIds.Child.Biological,
+        relationshipId === RelationshipTypeIds.Parent.Adopted
+          ? RelationshipTypeIds.Child.Adopted
+          : RelationshipTypeIds.Child.Biological,
     })
     parentEdges.push({
       family_id: familyId,

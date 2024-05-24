@@ -7,7 +7,7 @@ import {
   upsertRelationship,
   upsertPartnerRelationships,
 } from "@/app/actions"
-import RelationshipIds from "@/app/tree/components/RelationshipIds"
+import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
 import {
   FamilyMember,
   Relationship,
@@ -320,12 +320,12 @@ export function ChildMode({
               </label>
               <select name="parents" id={`parents-${parent.id}`}>
                 <option
-                  value={`${parent.id}-${RelationshipIds.Parent.Biological}`}
+                  value={`${parent.id}-${RelationshipTypeIds.Parent.Biological}`}
                 >
                   Biolgical
                 </option>
                 <option
-                  value={`${parent.id}-${RelationshipIds.Parent.Adopted}`}
+                  value={`${parent.id}-${RelationshipTypeIds.Parent.Adopted}`}
                 >
                   Adopter
                 </option>
@@ -375,9 +375,13 @@ export function PartnerModal({
         <div>
           <label htmlFor="relationship-select">Relationship type: </label>
           <select name="relationship" id="relationship-select">
-            <option value={RelationshipIds.Partner.Married}>Married</option>
-            <option value={RelationshipIds.Partner.Unmarried}>Unmarried</option>
-            <option value={RelationshipIds.Partner.Separated}>Seperated</option>
+            <option value={RelationshipTypeIds.Partner.Married}>Married</option>
+            <option value={RelationshipTypeIds.Partner.Unmarried}>
+              Unmarried
+            </option>
+            <option value={RelationshipTypeIds.Partner.Separated}>
+              Seperated
+            </option>
           </select>
         </div>
         <button onClick={onClose}>Cancel</button>
@@ -419,13 +423,13 @@ export function ParentModal({
                 family_id: familyId,
                 from: node.id,
                 to: parent.id,
-                relationship_type: RelationshipIds.Child.Biological,
+                relationship_type: RelationshipTypeIds.Child.Biological,
               },
               {
                 family_id: familyId,
                 from: parent.id,
                 to: node.id,
-                relationship_type: RelationshipIds.Parent.Biological,
+                relationship_type: RelationshipTypeIds.Parent.Biological,
               },
             ]
             await upsertEdges(relationships)
@@ -435,10 +439,12 @@ export function ParentModal({
           <div>
             This parent is the{" "}
             <select name="relationship" id="relationship-select">
-              <option value={RelationshipIds.Parent.Biological}>
+              <option value={RelationshipTypeIds.Parent.Biological}>
                 biological
               </option>
-              <option value={RelationshipIds.Parent.Adopted}>adopted</option>
+              <option value={RelationshipTypeIds.Parent.Adopted}>
+                adopted
+              </option>
             </select>{" "}
             parent of {node.first_name} {node.second_name}
           </div>
@@ -460,9 +466,13 @@ export function ParentModal({
       >
         <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
         <select name="relationship" id="relationship-select">
-          <option value={RelationshipIds.Partner.Married}>Married</option>
-          <option value={RelationshipIds.Partner.Unmarried}>Unmarried</option>
-          <option value={RelationshipIds.Partner.Separated}>Seperated</option>
+          <option value={RelationshipTypeIds.Partner.Married}>Married</option>
+          <option value={RelationshipTypeIds.Partner.Unmarried}>
+            Unmarried
+          </option>
+          <option value={RelationshipTypeIds.Partner.Separated}>
+            Seperated
+          </option>
         </select>
         <div>
           <button type="submit">Submit</button>

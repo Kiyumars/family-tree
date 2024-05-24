@@ -17,7 +17,7 @@ export default async function TreePage({ params }: { params: { id: number } }) {
 }
 
 async function Tree({ id }: { id: number }) {
-  const { membersRes, relationshipsRes, relationshipTypesRes } =
+  const { membersRes, relationshipsRes } =
     await fetchTreeData(id)
 
   return (
@@ -25,7 +25,6 @@ async function Tree({ id }: { id: number }) {
       familyId={id}
       familyMembers={membersRes.data}
       relationships={relationshipsRes.data}
-      relationshipTypes={relationshipTypesRes.data}
     />
   )
 }

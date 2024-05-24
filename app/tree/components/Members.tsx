@@ -2,7 +2,6 @@ import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
 import {
   mapAdjencies,
   mapFamilyMembers,
-  mapRelationshipTypes,
   setHierarchies,
 } from "../utils/utils"
 import MembersGraph from "./MembersGraph"
@@ -11,14 +10,12 @@ interface Props {
   familyId: number
   familyMembers: FamilyMember[]
   relationships: Relationship[]
-  relationshipTypes: RelationshipType[]
 }
 
 export default function Members({
   familyId,
   familyMembers,
   relationships,
-  relationshipTypes,
 }: Props) {
   if (!familyMembers.length) {
     return (
@@ -29,8 +26,7 @@ export default function Members({
   }
 
   const fmMap = mapFamilyMembers(familyMembers)
-  const rtMap = mapRelationshipTypes(relationshipTypes)
-  const adjMap = mapAdjencies(familyMembers, relationships, rtMap)
+  const adjMap = mapAdjencies(familyMembers, relationships)
   const hierarchies = setHierarchies(familyMembers, adjMap)
   const nodes = familyMembers.map((member) => {
     return {
