@@ -401,6 +401,7 @@ export function ParentModal({
           Add {parents.length < 1 ? <>first</> : <>second</>} parent of{" "}
           {`${node.first_name} ${node.second_name}`}
         </h1>
+        {/* // todo add input for relationship type */}
         <Form
           formAction={async (formData: FormData) => {
             formData.append("family_id", familyId.toString())
