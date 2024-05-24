@@ -1,8 +1,24 @@
-import { RelationshipType } from "@/common.types"
+import { RelationshipType, Relationship } from "@/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { createMembers } from "../../../stories/util"
-import { Adjacencies, createAdjaciencies, setHierarchies } from "./utils"
+import {
+  Adjacencies,
+  createAdjaciencies,
+  mapAdjencies,
+  setHierarchies,
+} from "./utils"
+import RelationshipIds from "../components/RelationshipIds"
+
+const rtMap: Record<number, RelationshipType> = {
+  1: { id: 1, type: "partner", subtype: "married" },
+  2: { id: 2, type: "partner", subtype: "unmarried" },
+  3: { id: 3, type: "child", subtype: "biological" },
+  4: { id: 4, type: "child", subtype: "adopted" },
+  5: { id: 5, type: "partner", subtype: "separated" },
+  6: { id: 6, type: "parent", subtype: "biological" },
+  7: { id: 7, type: "parent", subtype: "adopted" },
+}
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {
@@ -109,5 +125,106 @@ describe("actions add level", () => {
     expect(hierarchies[members[2].id]).toEqual(1)
     expect(hierarchies[members[3].id]).toEqual(1)
     expect(hierarchies[members[4].id]).toEqual(2)
+  })
+})
+
+describe("util mapAdjacencies", () => {
+  test("should return empty adjacencies", () => {
+    const members = createMembers([
+      { first_name: "Single", second_name: "Person" },
+    ])
+    const relationships: Relationship[] = []
+    const adjMap = mapAdjencies(members, relationships, rtMap)
+    expect(adjMap[1].children.size).toBe(0)
+    expect(adjMap[1].parents.size).toBe(0)
+    expect(adjMap[1].partners.size).toBe(0)
+  })
+  test("should return partnership", () => {
+    const members = createMembers([
+      { first_name: "Man", second_name: "Couple" },
+      { first_name: "Woman", second_name: "Couple" },
+    ])
+    const relationships: Relationship[] = [
+      {
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 2,
+        relationship_type: RelationshipIds.Partner.Married,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 2,
+        to: 1,
+        relationship_type: RelationshipIds.Partner.Married,
+      },
+    ]
+    const adjMap = mapAdjencies(members, relationships, rtMap)
+    expect(adjMap[1].children.size).toBe(0)
+    expect(adjMap[1].parents.size).toBe(0)
+    expect(adjMap[1].partners.size).toBe(1)
+    expect(adjMap[2].partners.size).toBe(1)
+  })
+  test("should return family with one child", () => {
+    const members = createMembers([
+      { first_name: "Man", second_name: "Couple" },
+      { first_name: "Woman", second_name: "Couple" },
+      { first_name: "Child", second_name: "Couple" },
+    ])
+    const relationships: Relationship[] = [
+      {
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 2,
+        relationship_type: RelationshipIds.Partner.Married,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 2,
+        to: 1,
+        relationship_type: RelationshipIds.Partner.Married,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 1,
+        to: 3,
+        relationship_type: RelationshipIds.Parent.Biological,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 3,
+        to: 1,
+        relationship_type: RelationshipIds.Child.Biological,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 2,
+        to: 3,
+        relationship_type: RelationshipIds.Parent.Biological,
+      },
+      {
+        id: 1,
+        family_id: 1,
+        from: 3,
+        to: 2,
+        relationship_type: RelationshipIds.Child.Biological,
+      },
+    ]
+    const adjMap = mapAdjencies(members, relationships, rtMap)
+    expect(adjMap[1].children.size).toBe(1)
+    expect(adjMap[1].parents.size).toBe(0)
+    expect(adjMap[1].partners.size).toBe(1)
+    expect(adjMap[2].children.size).toBe(1)
+    expect(adjMap[2].parents.size).toBe(0)
+    expect(adjMap[2].partners.size).toBe(1)
+    expect(adjMap[3].children.size).toBe(0)
+    expect(adjMap[3].parents.size).toBe(2)
+    expect(adjMap[3].partners.size).toBe(0)
   })
 })

@@ -68,24 +68,23 @@ export function mapAdjencies(
   relationships: Relationship[],
   relationshipTypes: Record<number, RelationshipType>
 ) {
-  const getRelationship = (id: number) => {
-    return relationshipTypes[id]
-  }
   const adjMap: Record<number, Adjacencies> = {}
-  for (let i = 0; i < familyMembers.length; i++) {
-    adjMap[familyMembers[i].id] = createAdjaciencies({})
-  }
-  for (let i = 0; i < relationships.length; i++) {
-    const { from, to, relationship_type } = relationships[i]
-    switch (getRelationship(relationship_type).type) {
+  familyMembers.forEach((fm) => {
+    adjMap[fm.id] = createAdjaciencies({})
+  })
+  relationships.forEach(({ from, to, relationship_type }) => {
+    switch (relationshipTypes[relationship_type].type) {
       case "parent":
         adjMap[from].children.add(to)
+        break
       case "child":
         adjMap[from].parents.add(to)
+        break
       case "partner":
         adjMap[from].partners.add(to)
+        break
     }
-  }
+  })
   return adjMap
 }
 
@@ -108,7 +107,7 @@ export function createAdjaciencies(props: {
     partners: new Set(),
   }
   props.children?.forEach((a) => adjencies.children.add(a))
-  props.parents?.forEach((a) => adjencies.parents.add(a))
-  props.partners?.forEach((a) => adjencies.partners.add(a))
+  props.parents?.forEach((b) => adjencies.parents.add(b))
+  props.partners?.forEach((c) => adjencies.partners.add(c))
   return adjencies
 }
