@@ -20,6 +20,6 @@ export default function ModalWrapper({
     if (ref.current) {
       setMounted(true)
     }
-  }, [ref.current])
+  }, [ref])
   return mounted && ref.current ? createPortal(content, ref.current) : null
 }
