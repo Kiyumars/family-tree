@@ -220,7 +220,7 @@ function PartnerSelection({
       <p>Second parent: </p>
       <form>
         {partners.map((p, i) => (
-          <div>
+          <div key={`partner-select-${p.id}`}>
             <input
               type="radio"
               name="partner"
@@ -304,7 +304,7 @@ export function ChildMode({
         <div>
           <p>These are the parents of the child</p>
           {[node, parentPartners[0]].map((parent, i) => (
-            <div>
+            <div key={`parent-${parent.id}`}>
               <label htmlFor={`parents-${i}`}>
                 {parent.first_name} {parent.second_name}
               </label>
