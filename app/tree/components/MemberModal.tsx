@@ -1,23 +1,17 @@
 "use client"
 
 import {
+  upsertBDrelationships,
   upsertChildsParents,
-  upsertEdges,
   upsertNode,
-  upsertRelationship,
   upsertPartnerRelationships,
 } from "@/app/actions"
 import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
-import {
-  FamilyMember,
-  Relationship,
-  RelationshipType,
-  RelationshipUpsert,
-} from "@/common.types"
+import { FamilyMember } from "@/common.types"
 import * as React from "react"
+import { Adjacencies } from "../utils/utils"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
-import { Adjacencies } from "../utils/utils"
 
 interface Props {
   onClose: () => void
@@ -408,31 +402,20 @@ export function ParentModal({
           Add {parents.length < 1 ? <>first</> : <>second</>} parent of{" "}
           {`${node.first_name} ${node.second_name}`}
         </h1>
-        {/* // todo add input for relationship type */}
         <Form
           familyId={familyId}
-          formAction={async (formData: FormData) => {
-            formData.append("family_id", familyId.toString())
-            const death = formData.get("death_date")
+          formAction={async (fd: FormData) => {
+            const death = fd.get("death_date")
             if (!death) {
-              formData.delete("death_date")
+              fd.delete("death_date")
             }
-            const parent = await upsertNode(formData)
-            const relationships: RelationshipUpsert[] = [
-              {
-                family_id: familyId,
-                from: node.id,
-                to: parent.id,
-                relationship_type: RelationshipTypeIds.Child.Biological,
-              },
-              {
-                family_id: familyId,
-                from: parent.id,
-                to: node.id,
-                relationship_type: RelationshipTypeIds.Parent.Biological,
-              },
-            ]
-            await upsertEdges(relationships)
+            const parent = await upsertNode(fd)
+            await upsertBDrelationships({
+              familyId,
+              from: parent.id,
+              to: node.id,
+              fd,
+            })
             setParents((prev) => [...prev, parent])
           }}
         >
@@ -460,7 +443,12 @@ export function ParentModal({
       </h1>
       <form
         action={async (fd: FormData) => {
-          await upsertRelationship(fd, familyId, parents, `/tree/${familyId}`)
+          await upsertBDrelationships({
+            familyId,
+            from: parents[0].id,
+            to: parents[1].id,
+            fd,
+          })
           onClose()
         }}
       >

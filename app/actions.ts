@@ -1,10 +1,12 @@
 "use server"
 
-import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
+import RelationshipTypeIds, {
+  rtMap,
+} from "@/app/tree/components/RelationshipTypes"
 import {
   FamilyMember,
   FamilyMemberUpsert,
-  RelationshipUpsert
+  RelationshipUpsert,
 } from "@/common.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
@@ -24,11 +26,10 @@ export async function fetchTreeData(familyId: number) {
     .select()
     .eq("family_id", familyId)
 
-  const [membersRes, relationshipsRes] =
-    await Promise.all([
-      fetchMembers,
-      fetchRelationships,
-    ])
+  const [membersRes, relationshipsRes] = await Promise.all([
+    fetchMembers,
+    fetchRelationships,
+  ])
   if (membersRes.error) {
     throw new Error(membersRes.error.message)
   }
@@ -236,4 +237,66 @@ export async function upsertPartnerRelationships({
     },
   ]
   await upsertEdges(relationships, revalidatedPath)
+}
+
+/**
+ *  upserts bidirectional relationships
+ */
+export async function upsertBDrelationships({
+  familyId,
+  fd,
+  from,
+  to,
+}: {
+  familyId: number
+  fd: FormData
+  from: number
+  to: number
+}) {
+  const schema = z.object({
+    relationship: z.coerce.number(),
+  })
+  const parse = schema.safeParse({
+    relationship: fd.get("relationship"),
+  })
+  if (!parse.success) {
+    throw Error("could not parse relationship from form")
+  }
+  const findRecipricol = (id: number) => {
+    const rt = rtMap[id]
+    switch (rt.type) {
+      case "partner":
+        return rt.id
+      case "parent":
+        if (rt.subtype === "adopted") {
+          return RelationshipTypeIds.Child.Adopted
+        }
+        return RelationshipTypeIds.Child.Biological
+      case "child":
+        if (rt.subtype === "adopted") {
+          return RelationshipTypeIds.Parent.Adopted
+        }
+        return RelationshipTypeIds.Parent.Biological
+    }
+  }
+  const rr = findRecipricol(parse.data.relationship)
+  if (!rr) {
+    throw new Error("could not find reciprical relationship")
+  }
+
+  const edges: RelationshipUpsert[] = [
+    {
+      family_id: familyId,
+      from: from,
+      to: to,
+      relationship_type: parse.data.relationship,
+    },
+    {
+      family_id: familyId,
+      from: to,
+      to: from,
+      relationship_type: rr,
+    },
+  ]
+  await upsertEdges(edges)
 }
