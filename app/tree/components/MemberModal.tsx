@@ -1,10 +1,9 @@
 "use client"
 
 import {
-  upsertBDrelationships,
   upsertChildsParents,
-  upsertNode,
-  upsertPartnerRelationships,
+  upsertFamilyMember,
+  upsertRelationship
 } from "@/app/actions"
 import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
 import { FamilyMember } from "@/common.types"
@@ -98,7 +97,7 @@ export function EditMode({
     if (!death) {
       formData.delete("death_date")
     }
-    const editedNode = await upsertNode(formData, `/tree/${familyId}`)
+    const editedNode = await upsertFamilyMember(formData, `/tree/${familyId}`)
     onSubmit(editedNode)
   }
   return (
@@ -254,9 +253,9 @@ export function ChildMode({
   getRelationships(node.id).partners.forEach((p) => {
     tmp.push(getFamilyMember(p))
   })
-  const [partners, setPartners] = React.useState(tmp)
+  const [parentPartners, setParentPartners] = React.useState(tmp)
 
-  if (partners.length < 1) {
+  if (parentPartners.length < 1) {
     return (
       <div>
         <h1>Please add an additional parent for child</h1>
@@ -269,12 +268,12 @@ export function ChildMode({
       </div>
     )
   }
-  if (partners.length > 1) {
+  if (parentPartners.length > 1) {
     return (
       <PartnerSelection
         parent={node}
-        partners={partners}
-        setPartners={setPartners}
+        partners={parentPartners}
+        setPartners={setParentPartners}
         onClose={onClose}
       />
     )
@@ -290,15 +289,12 @@ export function ChildMode({
           if (!death) {
             fd.delete("death_date")
           }
-
-          const parentsFD = fd.getAll("parents")
-          fd.delete("parents")
-          const child = await upsertNode(fd)
-
+          const child = await upsertFamilyMember(fd)
           await upsertChildsParents({
-            parents: parentsFD,
+            fd: fd,
             familyId: familyId,
             childId: child.id,
+            parents: [node, parentPartners[0]],
             revalidatedPath: `/tree/${familyId}`,
           })
           setNode(child)
@@ -307,20 +303,16 @@ export function ChildMode({
       >
         <div>
           <p>These are the parents of the child</p>
-          {[node, partners[0]].map((parent) => (
+          {[node, parentPartners[0]].map((parent, i) => (
             <div>
-              <label htmlFor={`parents-${parent.id}`}>
+              <label htmlFor={`parents-${i}`}>
                 {parent.first_name} {parent.second_name}
               </label>
-              <select name="parents" id={`parents-${parent.id}`}>
-                <option
-                  value={`${parent.id}-${RelationshipTypeIds.Parent.Biological}`}
-                >
+              <select name="parents" id={`parents-${i}`}>
+                <option value={RelationshipTypeIds.Parent.Biological}>
                   Biolgical
                 </option>
-                <option
-                  value={`${parent.id}-${RelationshipTypeIds.Parent.Adopted}`}
-                >
+                <option value={RelationshipTypeIds.Parent.Adopted}>
                   Adopter
                 </option>
               </select>
@@ -355,11 +347,12 @@ export function PartnerModal({
           if (!death) {
             fd.delete("death_date")
           }
-          const partner = await upsertNode(fd)
-          await upsertPartnerRelationships({
+          const partner = await upsertFamilyMember(fd)
+          await upsertRelationship({
             fd,
             familyId,
-            partners: [node.id, partner.id],
+            from: node.id,
+            to: partner.id,
             revalidatedPath: `/tree/${familyId}`,
           })
           setNode(partner)
@@ -409,8 +402,8 @@ export function ParentModal({
             if (!death) {
               fd.delete("death_date")
             }
-            const parent = await upsertNode(fd)
-            await upsertBDrelationships({
+            const parent = await upsertFamilyMember(fd)
+            await upsertRelationship({
               familyId,
               from: parent.id,
               to: node.id,
@@ -443,11 +436,12 @@ export function ParentModal({
       </h1>
       <form
         action={async (fd: FormData) => {
-          await upsertBDrelationships({
+          await upsertRelationship({
             familyId,
             from: parents[0].id,
             to: parents[1].id,
             fd,
+            revalidatedPath: `/tree/${familyId}`
           })
           onClose()
         }}

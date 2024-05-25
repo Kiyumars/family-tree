@@ -1,5 +1,10 @@
-import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
-import { rtMap } from "../components/RelationshipTypes"
+import {
+  FamilyMember,
+  Relationship,
+  RelationshipType,
+  RelationshipUpsert,
+} from "@/common.types"
+import RelationshipTypeIds, { rtMap } from "../components/RelationshipTypes"
 
 export interface Adjacencies {
   partners: Set<number>
@@ -110,4 +115,39 @@ export function createAdjaciencies(props: {
   props.parents?.forEach((b) => adjencies.parents.add(b))
   props.partners?.forEach((c) => adjencies.partners.add(c))
   return adjencies
+}
+
+export const findRecipricol = (id: number) => {
+  const rt = rtMap[id]
+  switch (rt.type) {
+    case "partner":
+      return rt.id
+    case "parent":
+      if (rt.subtype === "adopted") {
+        return RelationshipTypeIds.Child.Adopted
+      }
+      return RelationshipTypeIds.Child.Biological
+    case "child":
+      if (rt.subtype === "adopted") {
+        return RelationshipTypeIds.Parent.Adopted
+      }
+      return RelationshipTypeIds.Parent.Biological
+    default:
+      throw new Error(`could not find reciprical id for ${id}`)
+  }
+}
+
+export const addRecipricolRelationships = (
+  rs: RelationshipUpsert[]
+): RelationshipUpsert[] => {
+  const ers: RelationshipUpsert[] = [...rs]
+  rs.forEach((r) => {
+    ers.push({
+      family_id: r.family_id,
+      from: r.to,
+      to: r.from,
+      relationship_type: findRecipricol(r.relationship_type),
+    })
+  })
+  return ers
 }
