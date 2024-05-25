@@ -34,7 +34,6 @@ export const OneEntry: Story = {
     return (
       <Members
         familyId={1}
-        relationshipTypes={RELATIONSHIP_TYPES}
         familyMembers={createMembers([
           { first_name: "Frank", second_name: "Sinatra" },
         ])}
@@ -54,7 +53,6 @@ export const TwoUnlinkedEntries: Story = {
           { first_name: "Dean", second_name: "Martin" },
         ])}
         relationships={[]}
-        relationshipTypes={RELATIONSHIP_TYPES}
       />
     )
   },
@@ -65,7 +63,6 @@ export const ParentChild: Story = {
     return (
       <Members
         familyId={1}
-        relationshipTypes={RELATIONSHIP_TYPES}
         familyMembers={createMembers([
           { first_name: "Frank", second_name: "Sinatra" },
           { first_name: "Dean", second_name: "Martin" },
@@ -96,7 +93,6 @@ export const TwoChildren: Story = {
     return (
       <Members
         familyId={1}
-        relationshipTypes={RELATIONSHIP_TYPES}
         familyMembers={createMembers([
           { first_name: "Beyonce", second_name: "Knowles" },
           { first_name: "Blue", second_name: "Knowles" },
@@ -128,7 +124,6 @@ export const ParentsWithOneChild: Story = {
     return (
       <Members
         familyId={1}
-        relationshipTypes={RELATIONSHIP_TYPES}
         familyMembers={createMembers([
           { first_name: "Beyonce", second_name: "Knowles" },
           { first_name: "Sean", second_name: "Carter" },
@@ -174,7 +169,6 @@ export const ParentsWithTwoChildren: Story = {
     return (
       <Members
         familyId={1}
-        relationshipTypes={RELATIONSHIP_TYPES}
         familyMembers={createMembers([
           { first_name: "Beyonce", second_name: "Knowles" },
           { first_name: "Sean", second_name: "Carter" },
@@ -235,7 +229,6 @@ export const ManWithSpouseAndPreviousChild: Story = {
     return (
       <Members
         familyId={1}
-        relationshipTypes={RELATIONSHIP_TYPES}
         familyMembers={createMembers([
           { first_name: "Beyonce", second_name: "Knowles" },
           { first_name: "Sean", second_name: "Carter" },

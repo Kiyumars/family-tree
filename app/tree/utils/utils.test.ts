@@ -8,17 +8,7 @@ import {
   mapAdjencies,
   setHierarchies,
 } from "./utils"
-import RelationshipIds from "../components/RelationshipIds"
-
-const rtMap: Record<number, RelationshipType> = {
-  1: { id: 1, type: "partner", subtype: "married" },
-  2: { id: 2, type: "partner", subtype: "unmarried" },
-  3: { id: 3, type: "child", subtype: "biological" },
-  4: { id: 4, type: "child", subtype: "adopted" },
-  5: { id: 5, type: "partner", subtype: "separated" },
-  6: { id: 6, type: "parent", subtype: "biological" },
-  7: { id: 7, type: "parent", subtype: "adopted" },
-}
+import RelationshipTypeIds, { rtMap } from "../components/RelationshipTypes"
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {
@@ -134,7 +124,7 @@ describe("util mapAdjacencies", () => {
       { first_name: "Single", second_name: "Person" },
     ])
     const relationships: Relationship[] = []
-    const adjMap = mapAdjencies(members, relationships, rtMap)
+    const adjMap = mapAdjencies(members, relationships)
     expect(adjMap[1].children.size).toBe(0)
     expect(adjMap[1].parents.size).toBe(0)
     expect(adjMap[1].partners.size).toBe(0)
@@ -150,17 +140,17 @@ describe("util mapAdjacencies", () => {
         family_id: 1,
         from: 1,
         to: 2,
-        relationship_type: RelationshipIds.Partner.Married,
+        relationship_type: RelationshipTypeIds.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 2,
         to: 1,
-        relationship_type: RelationshipIds.Partner.Married,
+        relationship_type: RelationshipTypeIds.Partner.Married,
       },
     ]
-    const adjMap = mapAdjencies(members, relationships, rtMap)
+    const adjMap = mapAdjencies(members, relationships)
     expect(adjMap[1].children.size).toBe(0)
     expect(adjMap[1].parents.size).toBe(0)
     expect(adjMap[1].partners.size).toBe(1)
@@ -178,45 +168,45 @@ describe("util mapAdjacencies", () => {
         family_id: 1,
         from: 1,
         to: 2,
-        relationship_type: RelationshipIds.Partner.Married,
+        relationship_type: RelationshipTypeIds.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 2,
         to: 1,
-        relationship_type: RelationshipIds.Partner.Married,
+        relationship_type: RelationshipTypeIds.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 1,
         to: 3,
-        relationship_type: RelationshipIds.Parent.Biological,
+        relationship_type: RelationshipTypeIds.Parent.Biological,
       },
       {
         id: 1,
         family_id: 1,
         from: 3,
         to: 1,
-        relationship_type: RelationshipIds.Child.Biological,
+        relationship_type: RelationshipTypeIds.Child.Biological,
       },
       {
         id: 1,
         family_id: 1,
         from: 2,
         to: 3,
-        relationship_type: RelationshipIds.Parent.Biological,
+        relationship_type: RelationshipTypeIds.Parent.Biological,
       },
       {
         id: 1,
         family_id: 1,
         from: 3,
         to: 2,
-        relationship_type: RelationshipIds.Child.Biological,
+        relationship_type: RelationshipTypeIds.Child.Biological,
       },
     ]
-    const adjMap = mapAdjencies(members, relationships, rtMap)
+    const adjMap = mapAdjencies(members, relationships)
     expect(adjMap[1].children.size).toBe(1)
     expect(adjMap[1].parents.size).toBe(0)
     expect(adjMap[1].partners.size).toBe(1)

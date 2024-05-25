@@ -1,12 +1,16 @@
 "use server"
 
-import RelationshipIds from "@/app/tree/components/RelationshipIds"
-import { FamilyMember, FamilyMemberUpsert, RelationshipUpsert } from "@/common.types"
+import {
+  FamilyMember,
+  FamilyMemberUpsert,
+  RelationshipUpsert,
+} from "@/common.types"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import { notFound } from "next/navigation"
 import { z } from "zod"
+import { addRecipricolRelationships, findRecipricol } from "./tree/utils/utils"
 
 export async function fetchTreeData(familyId: number) {
   const client = createClient()
@@ -19,22 +23,16 @@ export async function fetchTreeData(familyId: number) {
     .from("family_member_relationships")
     .select()
     .eq("family_id", familyId)
-  const fetchRelationshipTypes = client.from("relationship_types").select()
 
-  const [membersRes, relationshipsRes, relationshipTypesRes] =
-    await Promise.all([
-      fetchMembers,
-      fetchRelationships,
-      fetchRelationshipTypes,
-    ])
+  const [membersRes, relationshipsRes] = await Promise.all([
+    fetchMembers,
+    fetchRelationships,
+  ])
   if (membersRes.error) {
     throw new Error(membersRes.error.message)
   }
   if (relationshipsRes.error) {
     throw new Error(relationshipsRes.error.message)
-  }
-  if (relationshipTypesRes.error) {
-    throw new Error(relationshipTypesRes.error.message)
   }
   if (!membersRes.data?.length) {
     const familyExists = await checkFamily(client, familyId)
@@ -43,7 +41,7 @@ export async function fetchTreeData(familyId: number) {
     }
   }
 
-  return { membersRes, relationshipsRes, relationshipTypesRes }
+  return { membersRes, relationshipsRes }
 }
 
 export async function checkFamily(
@@ -54,7 +52,10 @@ export async function checkFamily(
   return res.data != null && res.data.length > 0
 }
 
-export async function upsertNode(fd: FormData, revalidatedPath?: string) {
+export async function upsertFamilyMember(
+  fd: FormData,
+  revalidatedPath?: string
+) {
   const schema = z.object({
     id: z.coerce.number().transform((x) => (x ? x : undefined)),
     family_id: z.coerce.number(),
@@ -80,14 +81,14 @@ export async function upsertNode(fd: FormData, revalidatedPath?: string) {
   if (!node.success) {
     throw node.error
   }
-  const upserted = await upsert(node.data)
+  const upserted = await upsertNode(node.data)
   if (revalidatedPath) {
     revalidatePath(revalidatedPath)
   }
   return upserted
 }
 
-async function upsert(node: FamilyMemberUpsert) {
+async function upsertNode(node: FamilyMemberUpsert) {
   const client = createClient()
   const { data, error } = await client
     .from("family_members")
@@ -115,12 +116,19 @@ export async function upsertEdges(
   return data
 }
 
-export async function upsertParents(
-  fd: FormData,
-  familyId: number,
-  parents: FamilyMember[],
+export async function upsertRelationship({
+  fd,
+  familyId,
+  from,
+  to,
+  revalidatedPath,
+}: {
+  fd: FormData
+  familyId: number
+  from: number
+  to: number
   revalidatedPath?: string
-) {
+}) {
   const schema = z.object({
     id: z.coerce.number(),
   })
@@ -130,111 +138,48 @@ export async function upsertParents(
   if (!relationship.success) {
     throw relationship.error
   }
-  if (parents.length != 2) {
-    throw new Error("parents do not have length 2")
-  }
-  await upsertEdges(
-    [
-      {
-        family_id: familyId,
-        from: parents[0].id,
-        to: parents[1].id,
-        relationship_type: relationship.data.id,
-      },
-      {
-        family_id: familyId,
-        from: parents[1].id,
-        to: parents[0].id,
-        relationship_type: relationship.data.id,
-      },
-    ],
-    revalidatedPath
-  )
+  const edges = addRecipricolRelationships([
+    {
+      family_id: familyId,
+      from: from,
+      to: to,
+      relationship_type: relationship.data.id,
+    },
+  ])
+  await upsertEdges(edges, revalidatedPath)
 }
 
 export async function upsertChildsParents({
+  fd,
   parents,
   childId,
   familyId,
   revalidatedPath,
 }: {
-  parents: FormDataEntryValue[]
+  fd: FormData
+  parents: FamilyMember[]
   familyId: number
   childId: number
   revalidatedPath?: string
 }) {
   const schema = z.object({
-    parents: z.string().array(),
+    parents: z.coerce.number().array(),
   })
   const parse = schema.safeParse({
-    parents: parents,
+    parents: fd.getAll("parents"),
   })
   if (!parse.success) {
-    throw Error("could not parse parents from form")
+    throw parse.error
   }
-
-  let parentEdges: RelationshipUpsert[] = []
-  parse.data.parents.forEach((pr) => {
-    const [parent, relationship] = pr.split("-")
-    const parentId = parseInt(parent, 10)
-    const relationshipId = parseInt(relationship, 10)
-    if (isNaN(parentId) || isNaN(relationshipId)) {
-      throw new Error("either parentId or relationshipId is NaN")
-    }
-    parentEdges.push({
-      family_id: familyId,
-      from: childId,
-      to: parentId,
-      relationship_type:
-        relationshipId === RelationshipIds.Parent.Adopted
-          ? RelationshipIds.Child.Adopted
-          : RelationshipIds.Child.Biological,
+  const parentEdges = addRecipricolRelationships(
+    parents.map((p, i) => {
+      return {
+        family_id: familyId,
+        from: p.id,
+        to: childId,
+        relationship_type: parse.data.parents[i],
+      }
     })
-    parentEdges.push({
-      family_id: familyId,
-      from: parentId,
-      to: childId,
-      relationship_type: relationshipId,
-    })
-  })
+  )
   await upsertEdges(parentEdges, revalidatedPath)
-
-  return parse.data.parents
-}
-
-export async function upsertPartnerRelationships({
-  fd,
-  partners,
-  familyId,
-  revalidatedPath,
-}: {
-  fd: FormData
-  partners: [number, number]
-  familyId: number
-  revalidatedPath?: string
-}) {
-  const schema = z.object({
-    relationship: z.coerce.number(),
-  })
-  const parse = schema.safeParse({
-    relationship: fd.get("relationship"),
-  })
-  if (!parse.success) {
-    throw Error("could not parse relationship from form")
-  }
-  const relationships = [
-    {
-      family_id: familyId,
-      from: partners[0],
-      to: partners[1],
-      relationship_type: parse.data.relationship,
-    },
-    {
-      family_id: familyId,
-      from: partners[1],
-      to: partners[0],
-      relationship_type: parse.data.relationship,
-    },
-  ]
-  await upsertEdges(relationships, revalidatedPath)
 }

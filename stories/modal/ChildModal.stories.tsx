@@ -1,9 +1,8 @@
 import MemberModal, { ChildMode } from "@/app/tree/components/MemberModal"
 import ModalWrapper from "@/app/tree/components/ModalWrapper"
-import RelationshipIds from "@/app/tree/components/RelationshipIds"
+import { Adjacencies, createAdjaciencies } from "@/app/tree/utils/utils"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers } from "../util"
-import { Adjacencies, createAdjaciencies } from "@/app/tree/utils/utils"
 
 const meta: Meta<typeof MemberModal> = {
   component: MemberModal,

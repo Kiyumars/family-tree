@@ -2,22 +2,15 @@
 
 import {
   upsertChildsParents,
-  upsertEdges,
-  upsertNode,
-  upsertParents,
-  upsertPartnerRelationships,
+  upsertFamilyMember,
+  upsertRelationship
 } from "@/app/actions"
-import RelationshipIds from "@/app/tree/components/RelationshipIds"
-import {
-  FamilyMember,
-  Relationship,
-  RelationshipType,
-  RelationshipUpsert,
-} from "@/common.types"
+import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
+import { FamilyMember } from "@/common.types"
 import * as React from "react"
+import { Adjacencies } from "../utils/utils"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
-import { Adjacencies } from "../utils/utils"
 
 interface Props {
   onClose: () => void
@@ -104,29 +97,32 @@ export function EditMode({
     if (!death) {
       formData.delete("death_date")
     }
-    const editedNode = await upsertNode(formData, `/tree/${familyId}`)
+    const editedNode = await upsertFamilyMember(formData, `/tree/${familyId}`)
     onSubmit(editedNode)
   }
   return (
     <div>
       <h1 className={styles.title}>MemberModal</h1>
-      <Form node={node} formAction={formAction} />
+      <Form familyId={familyId} node={node} formAction={formAction} />
       <button onClick={onClose}>Close</button>
     </div>
   )
 }
 
 function Form({
+  familyId,
   children,
   node,
   formAction,
 }: {
+  familyId: number
   children?: React.ReactNode
   node?: FamilyMember
   formAction: (formData: FormData) => void
 }) {
   return (
     <form action={formAction}>
+      <input type="number" hidden name="family_id" value={familyId} />
       <div>
         <label htmlFor="first_name">First name: </label>
         <input
@@ -257,9 +253,9 @@ export function ChildMode({
   getRelationships(node.id).partners.forEach((p) => {
     tmp.push(getFamilyMember(p))
   })
-  const [partners, setPartners] = React.useState(tmp)
+  const [parentPartners, setParentPartners] = React.useState(tmp)
 
-  if (partners.length < 1) {
+  if (parentPartners.length < 1) {
     return (
       <div>
         <h1>Please add an additional parent for child</h1>
@@ -272,12 +268,12 @@ export function ChildMode({
       </div>
     )
   }
-  if (partners.length > 1) {
+  if (parentPartners.length > 1) {
     return (
       <PartnerSelection
         parent={node}
-        partners={partners}
-        setPartners={setPartners}
+        partners={parentPartners}
+        setPartners={setParentPartners}
         onClose={onClose}
       />
     )
@@ -287,21 +283,18 @@ export function ChildMode({
     <div>
       <h1>Add new child</h1>
       <Form
+        familyId={familyId}
         formAction={async (fd: FormData) => {
-          fd.append("family_id", familyId.toString())
           const death = fd.get("death_date")
           if (!death) {
             fd.delete("death_date")
           }
-
-          const parentsFD = fd.getAll("parents")
-          fd.delete("parents")
-          const child = await upsertNode(fd)
-
+          const child = await upsertFamilyMember(fd)
           await upsertChildsParents({
-            parents: parentsFD,
+            fd: fd,
             familyId: familyId,
             childId: child.id,
+            parents: [node, parentPartners[0]],
             revalidatedPath: `/tree/${familyId}`,
           })
           setNode(child)
@@ -310,20 +303,16 @@ export function ChildMode({
       >
         <div>
           <p>These are the parents of the child</p>
-          {[node, partners[0]].map((parent) => (
+          {[node, parentPartners[0]].map((parent, i) => (
             <div>
-              <label htmlFor={`parents-${parent.id}`}>
+              <label htmlFor={`parents-${i}`}>
                 {parent.first_name} {parent.second_name}
               </label>
-              <select name="parents" id={`parents-${parent.id}`}>
-                <option
-                  value={`${parent.id}-${RelationshipIds.Parent.Biological}`}
-                >
+              <select name="parents" id={`parents-${i}`}>
+                <option value={RelationshipTypeIds.Parent.Biological}>
                   Biolgical
                 </option>
-                <option
-                  value={`${parent.id}-${RelationshipIds.Parent.Adopted}`}
-                >
+                <option value={RelationshipTypeIds.Parent.Adopted}>
                   Adopter
                 </option>
               </select>
@@ -352,17 +341,18 @@ export function PartnerModal({
         Add partner of {node.first_name} {node.second_name}
       </h1>
       <Form
+        familyId={familyId}
         formAction={async (fd) => {
-          fd.append("family_id", familyId.toString())
           const death = fd.get("death_date")
           if (!death) {
             fd.delete("death_date")
           }
-          const partner = await upsertNode(fd)
-          await upsertPartnerRelationships({
+          const partner = await upsertFamilyMember(fd)
+          await upsertRelationship({
             fd,
             familyId,
-            partners: [node.id, partner.id],
+            from: node.id,
+            to: partner.id,
             revalidatedPath: `/tree/${familyId}`,
           })
           setNode(partner)
@@ -372,9 +362,13 @@ export function PartnerModal({
         <div>
           <label htmlFor="relationship-select">Relationship type: </label>
           <select name="relationship" id="relationship-select">
-            <option value={RelationshipIds.Partner.Married}>Married</option>
-            <option value={RelationshipIds.Partner.Unmarried}>Unmarried</option>
-            <option value={RelationshipIds.Partner.Separated}>Seperated</option>
+            <option value={RelationshipTypeIds.Partner.Married}>Married</option>
+            <option value={RelationshipTypeIds.Partner.Unmarried}>
+              Unmarried
+            </option>
+            <option value={RelationshipTypeIds.Partner.Separated}>
+              Seperated
+            </option>
           </select>
         </div>
         <button onClick={onClose}>Cancel</button>
@@ -401,33 +395,36 @@ export function ParentModal({
           Add {parents.length < 1 ? <>first</> : <>second</>} parent of{" "}
           {`${node.first_name} ${node.second_name}`}
         </h1>
-        {/* // todo add input for relationship type */}
         <Form
-          formAction={async (formData: FormData) => {
-            formData.append("family_id", familyId.toString())
-            const death = formData.get("death_date")
+          familyId={familyId}
+          formAction={async (fd: FormData) => {
+            const death = fd.get("death_date")
             if (!death) {
-              formData.delete("death_date")
+              fd.delete("death_date")
             }
-            const parent = await upsertNode(formData)
-            const relationships: RelationshipUpsert[] = [
-              {
-                family_id: familyId,
-                from: node.id,
-                to: parent.id,
-                relationship_type: RelationshipIds.Child.Biological,
-              },
-              {
-                family_id: familyId,
-                from: parent.id,
-                to: node.id,
-                relationship_type: RelationshipIds.Parent.Biological,
-              },
-            ]
-            await upsertEdges(relationships)
+            const parent = await upsertFamilyMember(fd)
+            await upsertRelationship({
+              familyId,
+              from: parent.id,
+              to: node.id,
+              fd,
+            })
             setParents((prev) => [...prev, parent])
           }}
-        />
+        >
+          <div>
+            This parent is the{" "}
+            <select name="relationship" id="relationship-select">
+              <option value={RelationshipTypeIds.Parent.Biological}>
+                biological
+              </option>
+              <option value={RelationshipTypeIds.Parent.Adopted}>
+                adopted
+              </option>
+            </select>{" "}
+            parent of {node.first_name} {node.second_name}
+          </div>
+        </Form>
       </div>
     )
   }
@@ -439,15 +436,25 @@ export function ParentModal({
       </h1>
       <form
         action={async (fd: FormData) => {
-          await upsertParents(fd, familyId, parents, `/tree/${familyId}`)
+          await upsertRelationship({
+            familyId,
+            from: parents[0].id,
+            to: parents[1].id,
+            fd,
+            revalidatedPath: `/tree/${familyId}`
+          })
           onClose()
         }}
       >
         <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
         <select name="relationship" id="relationship-select">
-          <option value={RelationshipIds.Partner.Married}>Married</option>
-          <option value={RelationshipIds.Partner.Unmarried}>Unmarried</option>
-          <option value={RelationshipIds.Partner.Separated}>Seperated</option>
+          <option value={RelationshipTypeIds.Partner.Married}>Married</option>
+          <option value={RelationshipTypeIds.Partner.Unmarried}>
+            Unmarried
+          </option>
+          <option value={RelationshipTypeIds.Partner.Separated}>
+            Seperated
+          </option>
         </select>
         <div>
           <button type="submit">Submit</button>
