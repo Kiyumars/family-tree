@@ -32,7 +32,7 @@ async function Content() {
       <ul>
         {tree.map((tree) => {
           return (
-            <li>
+            <li key={`tree-${tree.id}`}>
               <Link href={`/tree/${tree.id}`}>{tree.name}</Link>
             </li>
           )
