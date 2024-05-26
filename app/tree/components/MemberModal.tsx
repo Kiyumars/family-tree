@@ -11,6 +11,7 @@ import * as React from "react"
 import { Adjacencies } from "../utils/utils"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
+import MemberForm from "./forms/MemberForm"
 
 interface Props {
   onClose: () => void
@@ -103,99 +104,9 @@ export function EditMode({
   return (
     <div>
       <h1 className={styles.title}>MemberModal</h1>
-      <Form familyId={familyId} node={node} formAction={formAction} />
+      <MemberForm familyId={familyId} node={node} formAction={formAction} />
       <button onClick={onClose}>Close</button>
     </div>
-  )
-}
-
-function Form({
-  familyId,
-  children,
-  node,
-  formAction,
-}: {
-  familyId: number
-  children?: React.ReactNode
-  node?: FamilyMember
-  formAction: (formData: FormData) => void
-}) {
-  return (
-    <form action={formAction}>
-      <input type="number" hidden name="family_id" value={familyId} />
-      <div>
-        <label htmlFor="first_name">First name: </label>
-        <input
-          type="text"
-          name="first_name"
-          defaultValue={node && node.first_name ? node.first_name : ""}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="second_name">Second name: </label>
-        <input
-          type="text"
-          name="second_name"
-          defaultValue={node && node.second_name ? node.second_name : ""}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="birth_date">Birth Date: </label>
-        <input
-          type="date"
-          name="birth_date"
-          defaultValue={node && node.birth_date ? node.birth_date : undefined}
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="death_date">Death Date: </label>
-        <input
-          type="date"
-          name="death_date"
-          defaultValue={node && node.death_date ? node.death_date : undefined}
-        />
-      </div>
-      <div>
-        <label htmlFor="gender-m">Male</label>
-        <input
-          type="radio"
-          id="gender-m"
-          name="gender"
-          value="m"
-          defaultChecked
-        />
-        <label htmlFor="gender-w">Female</label>
-
-        <input
-          type="radio"
-          id="gender-w"
-          name="gender"
-          value="w"
-          defaultChecked
-        />
-      </div>
-      <div>
-        <label htmlFor="profession">Profession: </label>
-        <textarea
-          name="profession"
-          defaultValue={node && node.profession ? node.profession : ""}
-        />
-      </div>
-      <div>
-        <label htmlFor="biography">Biography: </label>
-        <textarea
-          name="biography"
-          defaultValue={node && node.biography ? node.biography : ""}
-        />
-      </div>
-
-      {children}
-
-      <button type="submit">Submit</button>
-    </form>
   )
 }
 
@@ -282,7 +193,7 @@ export function ChildMode({
   return (
     <div>
       <h1>Add new child</h1>
-      <Form
+      <MemberForm
         familyId={familyId}
         formAction={async (fd: FormData) => {
           const death = fd.get("death_date")
@@ -319,7 +230,7 @@ export function ChildMode({
             </div>
           ))}
         </div>
-      </Form>
+      </MemberForm>
       <button onClick={onClose}>Cancel</button>
     </div>
   )
@@ -340,7 +251,7 @@ export function PartnerModal({
       <h1>
         Add partner of {node.first_name} {node.second_name}
       </h1>
-      <Form
+      <MemberForm
         familyId={familyId}
         formAction={async (fd) => {
           const death = fd.get("death_date")
@@ -372,7 +283,7 @@ export function PartnerModal({
           </select>
         </div>
         <button onClick={onClose}>Cancel</button>
-      </Form>
+      </MemberForm>
     </div>
   )
 }
@@ -395,7 +306,7 @@ export function ParentModal({
           Add {parents.length < 1 ? <>first</> : <>second</>} parent of{" "}
           {`${node.first_name} ${node.second_name}`}
         </h1>
-        <Form
+        <MemberForm
           familyId={familyId}
           formAction={async (fd: FormData) => {
             const death = fd.get("death_date")
@@ -424,7 +335,7 @@ export function ParentModal({
             </select>{" "}
             parent of {node.first_name} {node.second_name}
           </div>
-        </Form>
+        </MemberForm>
       </div>
     )
   }
