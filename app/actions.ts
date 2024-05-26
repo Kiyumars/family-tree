@@ -183,3 +183,23 @@ export async function upsertChildsParents({
   )
   await upsertEdges(parentEdges, revalidatedPath)
 }
+
+export async function deleteFamilyMember(id: number, revalidatedPath?: string) {
+  const client = createClient()
+  const res = await client
+    .from("family_members")
+    .delete({ count: "exact" })
+    .eq("id", id)
+    .select()
+    .throwOnError()
+  if (res.error !== null) {
+    throw res.error
+  }
+  if (res.count !== 1) {
+    throw new Error(`could not delete family member ${id}`)
+  }
+
+  if (revalidatedPath) {
+    revalidatePath(revalidatedPath)
+  }
+}

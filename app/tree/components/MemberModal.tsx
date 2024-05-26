@@ -1,9 +1,10 @@
 "use client"
 
 import {
+  deleteFamilyMember,
   upsertChildsParents,
   upsertFamilyMember,
-  upsertRelationship
+  upsertRelationship,
 } from "@/app/actions"
 import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
 import { FamilyMember } from "@/common.types"
@@ -77,17 +78,16 @@ export function ReadMode({
   )
 }
 
-export function EditMode({
+export async function EditMode({
   familyId,
   node,
   onClose,
-  onSubmit,
-}: {
-  familyId: number
-  node: FamilyMember
-  onClose: () => void
-  onSubmit: (node: FamilyMember) => void
-}) {
+  setModalMode,
+  setNode,
+}: Pick<
+  CreateModalProps,
+  "familyId" | "node" | "onClose" | "setModalMode" | "setNode"
+>) {
   const formAction = async (formData: FormData) => {
     if (node.id) {
       formData.append("id", node.id.toString())
@@ -98,13 +98,16 @@ export function EditMode({
       formData.delete("death_date")
     }
     const editedNode = await upsertFamilyMember(formData, `/tree/${familyId}`)
-    onSubmit(editedNode)
+    setNode(editedNode)
+    setModalMode(Mode.Read)
   }
   return (
     <div>
       <h1 className={styles.title}>MemberModal</h1>
       <Form familyId={familyId} node={node} formAction={formAction} />
       <button onClick={onClose}>Close</button>
+      {/* todo only display edit for admins */}
+      <button onClick={() => setModalMode(Mode.Delete)}>Delete</button>
     </div>
   )
 }
@@ -441,7 +444,7 @@ export function ParentModal({
             from: parents[0].id,
             to: parents[1].id,
             fd,
-            revalidatedPath: `/tree/${familyId}`
+            revalidatedPath: `/tree/${familyId}`,
           })
           onClose()
         }}
@@ -490,6 +493,29 @@ export default function MemberModal({
   )
 }
 
+function DeleteMode({
+  node,
+  onClose,
+  familyId,
+}: Pick<Props, "node" | "onClose" | "familyId">) {
+  return (
+    <div>
+      <h1>
+        Are you sure you want to delete {node.first_name} {node.second_name}?
+      </h1>
+      <button onClick={onClose}>No</button>
+      <button
+        onClick={async () => {
+          await deleteFamilyMember(node.id, `/tree/${familyId}`)
+          onClose()
+        }}
+      >
+        Yes
+      </button>
+    </div>
+  )
+}
+
 function Content({
   familyId,
   modalMode,
@@ -513,10 +539,8 @@ function Content({
           familyId={familyId}
           node={node}
           onClose={onClose}
-          onSubmit={(editedNode) => {
-            setNode(editedNode)
-            setModalMode(Mode.Read)
-          }}
+          setModalMode={setModalMode}
+          setNode={setNode}
         />
       )
     case Mode.Create.Child:
@@ -553,6 +577,8 @@ function Content({
           setNode={setNode}
         />
       )
+    case Mode.Delete:
+      return <DeleteMode onClose={onClose} node={node} familyId={familyId} />
     default:
       return <ReadMode node={node} onClose={onClose} onSetMode={setModalMode} />
   }
