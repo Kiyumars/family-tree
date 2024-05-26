@@ -19,10 +19,16 @@ export default async function Trees() {
 async function Content() {
   const client = createClient()
   const { data: tree } = await client.from("trees").select()
+  const createButton = (
+    <Link href="/tree/create">
+      <button>Create a new family</button>
+    </Link>
+  )
   if (!tree || !tree.length) {
     return (
       <div>
         <h1>There are no families in the database</h1>
+        {createButton}
       </div>
     )
   }
@@ -38,6 +44,7 @@ async function Content() {
           )
         })}
       </ul>
+      {createButton}
     </div>
   )
 }

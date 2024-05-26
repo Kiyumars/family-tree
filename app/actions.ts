@@ -183,3 +183,27 @@ export async function upsertChildsParents({
   )
   await upsertEdges(parentEdges, revalidatedPath)
 }
+
+export async function createTree(fd: FormData) {
+  const schema = z.object({
+    name: z.string(),
+    description: z.string(),
+  })
+  const parse = schema.safeParse({
+    name: fd.get("name"),
+    description: fd.get("description"),
+  })
+  if (!parse.success) {
+    throw parse.error
+  }
+  const client = createClient()
+  const { data, error } = await client
+    .from("trees")
+    .insert({ name: parse.data.name, description: parse.data.description })
+    .select("id")
+    .single()
+  if (error) {
+    throw error
+  }
+  return data.id
+}
