@@ -36,8 +36,7 @@ export const CreateParentFirstScreen: Story = {
             getFamilyMember={getFamilyMember}
             onClose={() => {}}
             familyId={1}
-            setModalMode={() => {}}
-            setNode={() => {}}
+            onSubmit={() => {}}
           />
         </ModalWrapper>
       </div>
@@ -73,8 +72,7 @@ export const CreateParentSecondScreen: Story = {
             getFamilyMember={getFamilyMember}
             onClose={() => {}}
             familyId={1}
-            setModalMode={() => {}}
-            setNode={() => {}}
+            onSubmit={() => {}}
           />
         </ModalWrapper>
       </div>
@@ -112,8 +110,7 @@ export const CreateParentThirdScreen: Story = {
             getFamilyMember={getFamilyMember}
             onClose={() => {}}
             familyId={1}
-            setModalMode={() => {}}
-            setNode={() => {}}
+            onSubmit={() => {}}
           />
         </ModalWrapper>
       </div>

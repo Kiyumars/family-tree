@@ -151,3 +151,17 @@ export const addRecipricolRelationships = (
   })
   return ers
 }
+
+export function createUrl({
+  baseURL,
+  params,
+}: {
+  baseURL: string
+  params?: { name: string; value: string }[]
+}) {
+  const searchParams = new URLSearchParams()
+  params?.forEach((p) => {
+    searchParams.append(p.name, p.value)
+  })
+  return `${baseURL}${searchParams.size > 0 ? `?${searchParams.toString()}` : ""}`
+}

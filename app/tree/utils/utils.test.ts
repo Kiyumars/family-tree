@@ -5,6 +5,7 @@ import { createMembers } from "../../../stories/util"
 import {
   Adjacencies,
   createAdjaciencies,
+  createUrl,
   mapAdjencies,
   setHierarchies,
 } from "./utils"
@@ -216,5 +217,16 @@ describe("util mapAdjacencies", () => {
     expect(adjMap[3].children.size).toBe(0)
     expect(adjMap[3].parents.size).toBe(2)
     expect(adjMap[3].partners.size).toBe(0)
+  })
+})
+
+describe("create url", () => {
+  test("should return url with params", () => {
+    expect(
+      createUrl({ baseURL: `/tree/1`, params: [{ name: "modal", value: "1" }] })
+    ).toBe("/tree/1?modal=1")
+  })
+  test("should return url with params", () => {
+    expect(createUrl({ baseURL: `/tree/1` })).toBe("/tree/1")
   })
 })

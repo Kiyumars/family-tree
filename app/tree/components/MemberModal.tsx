@@ -3,38 +3,38 @@
 import {
   upsertChildsParents,
   upsertFamilyMember,
-  upsertRelationship
+  upsertRelationship,
 } from "@/app/actions"
 import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
 import { FamilyMember } from "@/common.types"
+import { useSearchParams } from "next/navigation"
 import * as React from "react"
 import { Adjacencies } from "../utils/utils"
 import styles from "./MemberModal.module.css"
-import ModalWrapper from "./ModalWrapper"
 
 interface Props {
   onClose: () => void
   familyId: number
-  node: FamilyMember
   getRelationships: (id: number) => Adjacencies
   getFamilyMember: (id: number) => FamilyMember
-  mode?: number
+  switchModal: (modalId: number, memberId: number) => void
 }
 
-type CreateModalProps = Props & {
-  setModalMode: (mode: number) => void
-  setNode: (node: FamilyMember) => void
+type CreateModalProps = Omit<Props, "switchModal"> & {
+  node: FamilyMember
+  onSubmit: (modalId: number, memberId: number) => void
 }
 
-const Mode = {
+export const Mode = {
   Read: 1,
   Edit: 2,
   Create: {
     Child: 3,
     Partner: 4,
     Parent: 5,
+    New: 6,
   },
-  Delete: 6,
+  Delete: 7,
 }
 
 export function ReadMode({
@@ -44,7 +44,7 @@ export function ReadMode({
 }: {
   node: FamilyMember
   onClose: () => void
-  onSetMode: (mode: number) => void
+  onSetMode: (modalId: number, memberId: number) => void
 }) {
   return (
     <div>
@@ -62,14 +62,16 @@ export function ReadMode({
         <button onClick={onClose}>Close</button>
       </div>
       <div>
-        <button onClick={() => onSetMode(Mode.Edit)}>Edit</button>
+        <button onClick={() => onSetMode(Mode.Edit, node.id)}>Edit</button>
       </div>
       <div>
-        <button onClick={() => onSetMode(Mode.Create.Child)}>Add child</button>
-        <button onClick={() => onSetMode(Mode.Create.Partner)}>
+        <button onClick={() => onSetMode(Mode.Create.Child, node.id)}>
+          Add child
+        </button>
+        <button onClick={() => onSetMode(Mode.Create.Partner, node.id)}>
           Add Partner
         </button>
-        <button onClick={() => onSetMode(Mode.Create.Parent)}>
+        <button onClick={() => onSetMode(Mode.Create.Parent, node.id)}>
           Add Parents
         </button>
       </div>
@@ -84,12 +86,12 @@ export function EditMode({
   onSubmit,
 }: {
   familyId: number
-  node: FamilyMember
+  node?: FamilyMember
   onClose: () => void
-  onSubmit: (node: FamilyMember) => void
+  onSubmit: (id: number) => void
 }) {
   const formAction = async (formData: FormData) => {
-    if (node.id) {
+    if (node?.id) {
       formData.append("id", node.id.toString())
     }
     formData.append("family_id", familyId.toString())
@@ -98,7 +100,7 @@ export function EditMode({
       formData.delete("death_date")
     }
     const editedNode = await upsertFamilyMember(formData, `/tree/${familyId}`)
-    onSubmit(editedNode)
+    onSubmit(editedNode.id)
   }
   return (
     <div>
@@ -246,8 +248,7 @@ export function ChildMode({
   getFamilyMember,
   getRelationships,
   onClose,
-  setModalMode,
-  setNode,
+  onSubmit,
 }: CreateModalProps) {
   const tmp: FamilyMember[] = []
   getRelationships(node.id).partners.forEach((p) => {
@@ -262,7 +263,7 @@ export function ChildMode({
         <p>
           Add a partner for {node.first_name} {node.second_name}
         </p>{" "}
-        <button onClick={() => setModalMode(Mode.Create.Partner)}>
+        <button onClick={() => onSubmit(Mode.Create.Partner, node.id)}>
           Add partner
         </button>
       </div>
@@ -297,8 +298,7 @@ export function ChildMode({
             parents: [node, parentPartners[0]],
             revalidatedPath: `/tree/${familyId}`,
           })
-          setNode(child)
-          setModalMode(Mode.Read)
+          onSubmit(Mode.Read, child.id)
         }}
       >
         <div>
@@ -328,9 +328,8 @@ export function ChildMode({
 export function PartnerModal({
   node,
   familyId,
-  setNode,
   onClose,
-  setModalMode,
+  onSubmit,
 }: Omit<
   CreateModalProps,
   "edges" | "getRelationshipType" | "getFamilyMember" | "getRelationships"
@@ -355,8 +354,7 @@ export function PartnerModal({
             to: partner.id,
             revalidatedPath: `/tree/${familyId}`,
           })
-          setNode(partner)
-          setModalMode(Mode.Read)
+          onSubmit(Mode.Read, partner.id)
         }}
       >
         <div>
@@ -441,7 +439,7 @@ export function ParentModal({
             from: parents[0].id,
             to: parents[1].id,
             fd,
-            revalidatedPath: `/tree/${familyId}`
+            revalidatedPath: `/tree/${familyId}`,
           })
           onClose()
         }}
@@ -467,56 +465,54 @@ export function ParentModal({
 export default function MemberModal({
   onClose,
   familyId,
-  node,
   getRelationships,
   getFamilyMember,
-  mode = Mode.Read,
+  switchModal,
 }: Props) {
-  const [modalMode, setModalMode] = React.useState(mode)
-  const [n, setNode] = React.useState(node)
-  return (
-    <ModalWrapper>
-      <Content
-        modalMode={modalMode}
-        node={n}
-        familyId={familyId}
-        setModalMode={setModalMode}
-        setNode={setNode}
-        getRelationships={getRelationships}
-        getFamilyMember={getFamilyMember}
-        onClose={onClose}
-      />
-    </ModalWrapper>
-  )
-}
+  const searchParams = useSearchParams()
+  const member = searchParams.get("member")
+  const memberId = member ? parseInt(member, 10) : undefined
 
-function Content({
-  familyId,
-  modalMode,
-  node,
-  onClose,
-  setModalMode,
-  setNode,
-  getFamilyMember,
-  getRelationships,
-}: Props & {
-  modalMode: number
-  setModalMode: (mode: number) => void
-  setNode: (node: FamilyMember) => void
-}) {
+  const node = memberId !== undefined ? getFamilyMember(memberId) : undefined
+  const modal = searchParams.get("modal")
+  if (!modal) {
+    onClose()
+    return
+  }
+  const modalMode = isNaN(parseInt(modal, 10)) ? undefined : parseInt(modal, 10)
+  if (!modalMode) {
+    onClose()
+    return
+  }
+
+  const switchToRead = (id: number) => {
+    switchModal(Mode.Read, id)
+  }
+
+  if (node === undefined) {
+    if (modalMode === Mode.Create.New) {
+      return (
+        <EditMode
+          familyId={familyId}
+          onClose={onClose}
+          onSubmit={switchToRead}
+        />
+      )
+    }
+    onClose()
+    return
+  }
+
   switch (modalMode) {
     case Mode.Read:
-      return <ReadMode node={node} onClose={onClose} onSetMode={setModalMode} />
+      return <ReadMode node={node} onClose={onClose} onSetMode={switchModal} />
     case Mode.Edit:
       return (
         <EditMode
           familyId={familyId}
           node={node}
           onClose={onClose}
-          onSubmit={(editedNode) => {
-            setNode(editedNode)
-            setModalMode(Mode.Read)
-          }}
+          onSubmit={switchToRead}
         />
       )
     case Mode.Create.Child:
@@ -526,8 +522,7 @@ function Content({
           node={node}
           getFamilyMember={getFamilyMember}
           onClose={onClose}
-          setNode={setNode}
-          setModalMode={setModalMode}
+          onSubmit={switchModal}
           getRelationships={getRelationships}
         />
       )
@@ -537,8 +532,7 @@ function Content({
           familyId={familyId}
           node={node}
           onClose={onClose}
-          setModalMode={setModalMode}
-          setNode={setNode}
+          onSubmit={switchModal}
         />
       )
     case Mode.Create.Parent:
@@ -548,12 +542,12 @@ function Content({
           node={node}
           getRelationships={getRelationships}
           getFamilyMember={getFamilyMember}
-          setModalMode={setModalMode}
+          onSubmit={switchModal}
           onClose={onClose}
-          setNode={setNode}
         />
       )
     default:
-      return <ReadMode node={node} onClose={onClose} onSetMode={setModalMode} />
+      onClose()
+      return
   }
 }

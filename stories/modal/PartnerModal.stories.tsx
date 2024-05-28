@@ -21,8 +21,7 @@ import { fakeMember } from "../util"
               node={fakeMember}
               onClose={() => {}}
               familyId={1}
-              setModalMode={() => {}}
-              setNode={() => {}}
+              onSubmit={() => {}}
             />
           </ModalWrapper>
         </div>

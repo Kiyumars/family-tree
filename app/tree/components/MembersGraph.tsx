@@ -1,11 +1,12 @@
 "use client"
 
-import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
+import { FamilyMember } from "@/common.types"
+import { useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
-import { DataSet } from "vis-data"
-import MemberModal from "./MemberModal"
-import { Adjacencies } from "../utils/utils"
+import { Adjacencies, createUrl } from "../utils/utils"
+import MemberModal, { Mode } from "./MemberModal"
+import ModalWrapper from "./ModalWrapper"
 
 interface Props {
   familyId: number
@@ -22,25 +23,39 @@ export function MembersGraph({
   familyId,
   familyMembers,
 }: Props) {
+  const searchParams = useSearchParams()
+  const { replace } = useRouter()
   const getRelationships = (id: number) => {
     return adjacenciesMap[id]
   }
   const getFamilyMember = (id: number) => {
     return familyMembers[id]
   }
-  const [selected, setSelected] = React.useState<FamilyMember | undefined>(
-    undefined
-  )
+
+  const switchModal = (modalId: number, memberId: number) => {
+    replace(
+      createUrl({
+        baseURL: `/tree/${familyId}`,
+        params: [
+          { name: "modal", value: modalId.toString() },
+          { name: "member", value: memberId.toString() },
+        ],
+      })
+    )
+  }
+
   return (
     <div>
-      {selected && (
-        <MemberModal
-          familyId={familyId}
-          node={selected}
-          getRelationships={getRelationships}
-          getFamilyMember={getFamilyMember}
-          onClose={() => setSelected(undefined)}
-        />
+      {searchParams.get("modal") && (
+        <ModalWrapper>
+          <MemberModal
+            familyId={familyId}
+            getRelationships={getRelationships}
+            getFamilyMember={getFamilyMember}
+            onClose={() => replace(`/tree/${familyId}`)}
+            switchModal={switchModal}
+          />
+        </ModalWrapper>
       )}
 
       <VisGraph
@@ -68,8 +83,7 @@ export function MembersGraph({
         }}
         events={{
           selectNode: (event: any) => {
-            const selectedNode = getFamilyMember(event.nodes[0])
-            setSelected(selectedNode)
+            switchModal(Mode.Read, getFamilyMember(event.nodes[0]).id)
           },
         }}
         // ref={(network: Network) => {

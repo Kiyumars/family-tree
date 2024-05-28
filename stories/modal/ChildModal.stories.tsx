@@ -37,8 +37,7 @@ export const CreateChildWithTwoParents: Story = {
             getFamilyMember={getFamilyMember}
             onClose={() => {}}
             familyId={1}
-            setModalMode={() => {}}
-            setNode={() => {}}
+            onSubmit={() => {}}
           />
         </ModalWrapper>
       </div>
@@ -73,8 +72,7 @@ export const CreateChildWithMultiplePossibleParents: Story = {
             getFamilyMember={getFamilyMember}
             onClose={() => {}}
             familyId={1}
-            setModalMode={() => {}}
-            setNode={() => {}}
+            onSubmit={() => {}}
           />
         </ModalWrapper>
       </div>
