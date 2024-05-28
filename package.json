@@ -5,7 +5,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest",
-    "lint": "npx tsc --noEmit && next lint && vitest",
+    "lint": "npx tsc --noEmit && next lint && vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
