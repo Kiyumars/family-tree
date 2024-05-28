@@ -1,14 +1,15 @@
-import { RelationshipType, Relationship } from "@/common.types"
+import { FamilyMember, Relationship } from "@/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { createMembers } from "../../../stories/util"
+import RelationshipTypeIds from "../components/RelationshipTypes"
 import {
   Adjacencies,
   createAdjaciencies,
   mapAdjencies,
+  mapNodes,
   setHierarchies,
 } from "./utils"
-import RelationshipTypeIds, { rtMap } from "../components/RelationshipTypes"
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {
@@ -216,5 +217,51 @@ describe("util mapAdjacencies", () => {
     expect(adjMap[3].children.size).toBe(0)
     expect(adjMap[3].parents.size).toBe(2)
     expect(adjMap[3].partners.size).toBe(0)
+  })
+})
+
+describe("createNodes", () => {
+  test("should return correct for family with partners", () => {
+    const members = createMembers([
+      { first_name: "Father", second_name: "Parent" },
+      { first_name: "Mother", second_name: "Parent" },
+      { first_name: "Brother", second_name: "Child" },
+      { first_name: "Sister", second_name: "Child" },
+      { first_name: "Spouse", second_name: "Brother" },
+      { first_name: "Spouse", second_name: "Sister" },
+    ])
+    const fmMap: Record<number, FamilyMember> = {}
+    members.forEach((fm) => {
+      fmMap[fm.id] = fm
+    })
+    const adjMap: Record<number, Adjacencies> = {
+      [1]: createAdjaciencies({ partners: [2], children: [3, 4] }),
+      [2]: createAdjaciencies({ partners: [1], children: [3, 4] }),
+      [3]: createAdjaciencies({ partners: [5], parents: [1, 2] }),
+      [4]: createAdjaciencies({ partners: [6], parents: [1, 2] }),
+      [5]: createAdjaciencies({ partners: [3] }),
+      [6]: createAdjaciencies({ partners: [4] }),
+    }
+    const hierarchies: Record<number, number> = {
+      [1]: 0,
+      [2]: 0,
+      [3]: 1,
+      [4]: 1,
+      [5]: 1,
+      [6]: 1,
+    }
+    const {nodes} = mapNodes(members, fmMap, adjMap, hierarchies)
+    const got = nodes.map((n) => n.label)
+    const expected = [
+      "Father Parent",
+      "Mother Parent",
+      "Brother Child",
+      "Spouse Brother",
+      "Sister Child",
+      "Spouse Sister",
+    ]
+    expected.forEach((ex, i) => {
+      expect(ex).toBe(got[i])
+    })
   })
 })

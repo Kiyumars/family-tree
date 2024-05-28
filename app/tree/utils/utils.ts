@@ -4,6 +4,7 @@ import {
   RelationshipType,
   RelationshipUpsert,
 } from "@/common.types"
+import { Node } from "react-vis-graph-wrapper"
 import RelationshipTypeIds, { rtMap } from "../components/RelationshipTypes"
 
 export interface Adjacencies {
@@ -150,4 +151,38 @@ export const addRecipricolRelationships = (
     })
   })
   return ers
+}
+
+export const mapNodes = (
+  fms: FamilyMember[],
+  fmMap: Record<number, FamilyMember>,
+  adjMap: Record<number, Adjacencies>,
+  hierarchies: Record<number, number>
+) => {
+  const nodes: Node[] = []
+  const memberToNode: Record<number, number> = {}
+  const nodeToMember: Record<number, number> = {}
+  const ordered = new Set<number>()
+  const nodify = (id: number): Node => {
+    const fm = fmMap[id]
+    memberToNode[id] = nodes.length
+    nodeToMember[nodes.length] = id
+    return {
+      id: nodes.length,
+      label: `${fm.first_name} ${fm.second_name}`,
+      level: hierarchies[id],
+    }
+  }
+  // re-order spouses over siblings
+  fms.forEach((m) => {
+    if (!ordered.has(m.id)) {
+      nodes.push(nodify(m.id))
+      ordered.add(m.id)
+      adjMap[m.id].partners.forEach((p) => {
+        nodes.push(nodify(p))
+        ordered.add(p)
+      })
+    }
+  })
+  return { nodes, memberToNode, nodeToMember }
 }
