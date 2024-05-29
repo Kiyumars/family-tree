@@ -5,12 +5,12 @@ import {
   upsertFamilyMember,
   upsertRelationship,
 } from "@/app/actions"
-import RelationshipByType from "@/app/tree/components/RelationshipTypes"
 import { FamilyMember } from "@/common.types"
 import * as React from "react"
 import { Adjacencies } from "../utils/utils"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
+import * as rtMap from "@/app/types/RelationshipTypes"
 
 interface Props {
   onClose: () => void
@@ -309,12 +309,10 @@ export function ChildMode({
                 {parent.first_name} {parent.second_name}
               </label>
               <select name="parents" id={`parents-${i}`}>
-                <option value={RelationshipByType.Parent.Biological}>
+                <option value={rtMap.ByType.Parent.Biological}>
                   Biolgical
                 </option>
-                <option value={RelationshipByType.Parent.Adopted}>
-                  Adopter
-                </option>
+                <option value={rtMap.ByType.Parent.Adopted}>Adopter</option>
               </select>
             </div>
           ))}
@@ -362,13 +360,9 @@ export function PartnerModal({
         <div>
           <label htmlFor="relationship-select">Relationship type: </label>
           <select name="relationship" id="relationship-select">
-            <option value={RelationshipByType.Partner.Married}>Married</option>
-            <option value={RelationshipByType.Partner.Unmarried}>
-              Unmarried
-            </option>
-            <option value={RelationshipByType.Partner.Separated}>
-              Seperated
-            </option>
+            <option value={rtMap.ByType.Partner.Married}>Married</option>
+            <option value={rtMap.ByType.Partner.Unmarried}>Unmarried</option>
+            <option value={rtMap.ByType.Partner.Separated}>Seperated</option>
           </select>
         </div>
         <button onClick={onClose}>Cancel</button>
@@ -415,10 +409,8 @@ export function ParentModal({
           <div>
             This parent is the{" "}
             <select name="relationship" id="relationship-select">
-              <option value={RelationshipByType.Parent.Biological}>
-                biological
-              </option>
-              <option value={RelationshipByType.Parent.Adopted}>adopted</option>
+              <option value={rtMap.ByType.Parent.Biological}>biological</option>
+              <option value={rtMap.ByType.Parent.Adopted}>adopted</option>
             </select>{" "}
             parent of {node.first_name} {node.second_name}
           </div>
@@ -446,13 +438,9 @@ export function ParentModal({
       >
         <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
         <select name="relationship" id="relationship-select">
-          <option value={RelationshipByType.Partner.Married}>Married</option>
-          <option value={RelationshipByType.Partner.Unmarried}>
-            Unmarried
-          </option>
-          <option value={RelationshipByType.Partner.Separated}>
-            Seperated
-          </option>
+          <option value={rtMap.ByType.Partner.Married}>Married</option>
+          <option value={rtMap.ByType.Partner.Unmarried}>Unmarried</option>
+          <option value={rtMap.ByType.Partner.Separated}>Seperated</option>
         </select>
         <div>
           <button type="submit">Submit</button>

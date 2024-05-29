@@ -2,7 +2,7 @@ import { Relationship } from "@/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { createMembers } from "../../../stories/util"
-import RelationshipByType from "../components/RelationshipTypes"
+import * as rtMap from "../../../app/types/RelationshipTypes"
 import {
   Adjacencies,
   createAdjaciencies,
@@ -140,14 +140,14 @@ describe("util mapAdjacencies", () => {
         family_id: 1,
         from: 1,
         to: 2,
-        relationship_type: RelationshipByType.Partner.Married,
+        relationship_type: rtMap.ByType.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 2,
         to: 1,
-        relationship_type: RelationshipByType.Partner.Married,
+        relationship_type: rtMap.ByType.Partner.Married,
       },
     ]
     const adjMap = mapAdjencies(members, relationships)
@@ -168,42 +168,42 @@ describe("util mapAdjacencies", () => {
         family_id: 1,
         from: 1,
         to: 2,
-        relationship_type: RelationshipByType.Partner.Married,
+        relationship_type: rtMap.ByType.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 2,
         to: 1,
-        relationship_type: RelationshipByType.Partner.Married,
+        relationship_type: rtMap.ByType.Partner.Married,
       },
       {
         id: 1,
         family_id: 1,
         from: 1,
         to: 3,
-        relationship_type: RelationshipByType.Parent.Biological,
+        relationship_type: rtMap.ByType.Parent.Biological,
       },
       {
         id: 1,
         family_id: 1,
         from: 3,
         to: 1,
-        relationship_type: RelationshipByType.Child.Biological,
+        relationship_type: rtMap.ByType.Child.Biological,
       },
       {
         id: 1,
         family_id: 1,
         from: 2,
         to: 3,
-        relationship_type: RelationshipByType.Parent.Biological,
+        relationship_type: rtMap.ByType.Parent.Biological,
       },
       {
         id: 1,
         family_id: 1,
         from: 3,
         to: 2,
-        relationship_type: RelationshipByType.Child.Biological,
+        relationship_type: rtMap.ByType.Child.Biological,
       },
     ]
     const adjMap = mapAdjencies(members, relationships)

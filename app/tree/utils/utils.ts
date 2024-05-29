@@ -4,7 +4,6 @@ import {
   RelationshipType,
   RelationshipUpsert,
 } from "@/common.types"
-import RelationshipByType from "../components/RelationshipTypes"
 import * as rtMap from "../../types/RelationshipTypes"
 
 export interface Adjacencies {
@@ -125,14 +124,14 @@ export const findRecipricol = (id: number) => {
       return rt.id
     case "parent":
       if (rt.subtype === "adopted") {
-        return RelationshipByType.Child.Adopted
+        return rtMap.ByType.Child.Adopted
       }
-      return RelationshipByType.Child.Biological
+      return rtMap.ByType.Child.Biological
     case "child":
       if (rt.subtype === "adopted") {
-        return RelationshipByType.Parent.Adopted
+        return rtMap.ByType.Parent.Adopted
       }
-      return RelationshipByType.Parent.Biological
+      return rtMap.ByType.Parent.Biological
     default:
       throw new Error(`could not find reciprical id for ${id}`)
   }
