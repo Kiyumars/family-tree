@@ -2,7 +2,7 @@ import { Relationship } from "@/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { createMembers } from "../../../stories/util"
-import * as rtMap from "../../../app/types/RelationshipTypes"
+import * as rtMap from "./maps/RelationshipTypes"
 import {
   Adjacencies,
   createAdjaciencies,

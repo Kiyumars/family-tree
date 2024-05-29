@@ -34,7 +34,7 @@ async function fetchRelationshipTypes() {
 
 function createFileContent(rts: RelationshipType[] | undefined) {
   if (rts === undefined) {
-    throw Error("could not fet relationship type")
+    throw Error("could not fetch relationship type")
   }
   const byId: Record<number, RelationshipType> = {}
   const byType: Record<string, { subtype: string; id: number }[]> = {}
@@ -65,7 +65,14 @@ ${c}
 }
 
 function writeToFile(content: string) {
-  const filePath = path.join(".", "app", "types", "RelationshipTypes.ts")
+  const filePath = path.join(
+    ".",
+    "app",
+    'tree',
+    "utils",
+    "maps",
+    "RelationshipTypes.ts"
+  )
   fs.writeFileSync(filePath, content, "utf8")
 }
 

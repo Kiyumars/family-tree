@@ -4,7 +4,7 @@ import {
   RelationshipType,
   RelationshipUpsert,
 } from "@/common.types"
-import * as rtMap from "../../types/RelationshipTypes"
+import * as rtMap from "./maps/RelationshipTypes"
 
 export interface Adjacencies {
   partners: Set<number>

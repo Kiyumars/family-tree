@@ -10,7 +10,7 @@ import * as React from "react"
 import { Adjacencies } from "../utils/utils"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "./ModalWrapper"
-import * as rtMap from "@/app/types/RelationshipTypes"
+import * as rtMap from "@/app/tree/utils/maps/RelationshipTypes"
 
 interface Props {
   onClose: () => void
