@@ -1,4 +1,4 @@
-import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
+import { FamilyMember, Relationship } from "@/common.types"
 import {
   mapAdjencies,
   mapFamilyMembers,
