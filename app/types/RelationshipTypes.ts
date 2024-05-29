@@ -37,3 +37,19 @@ export const ById: Record<number, RelationshipType> = {
     subtype: "adopted",
   },
 }
+
+export const ByType = {
+  Child: {
+    Biological: 3,
+    Adopted: 4,
+  },
+  Parent: {
+    Biological: 6,
+    Adopted: 7,
+  },
+  Partner: {
+    Married: 1,
+    Unmarried: 2,
+    Separated: 5,
+  },
+}
