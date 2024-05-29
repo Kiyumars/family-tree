@@ -3,9 +3,9 @@
 import {
   upsertChildsParents,
   upsertFamilyMember,
-  upsertRelationship
+  upsertRelationship,
 } from "@/app/actions"
-import RelationshipTypeIds from "@/app/tree/components/RelationshipTypes"
+import RelationshipByType from "@/app/tree/components/RelationshipTypes"
 import { FamilyMember } from "@/common.types"
 import * as React from "react"
 import { Adjacencies } from "../utils/utils"
@@ -309,10 +309,10 @@ export function ChildMode({
                 {parent.first_name} {parent.second_name}
               </label>
               <select name="parents" id={`parents-${i}`}>
-                <option value={RelationshipTypeIds.Parent.Biological}>
+                <option value={RelationshipByType.Parent.Biological}>
                   Biolgical
                 </option>
-                <option value={RelationshipTypeIds.Parent.Adopted}>
+                <option value={RelationshipByType.Parent.Adopted}>
                   Adopter
                 </option>
               </select>
@@ -362,11 +362,11 @@ export function PartnerModal({
         <div>
           <label htmlFor="relationship-select">Relationship type: </label>
           <select name="relationship" id="relationship-select">
-            <option value={RelationshipTypeIds.Partner.Married}>Married</option>
-            <option value={RelationshipTypeIds.Partner.Unmarried}>
+            <option value={RelationshipByType.Partner.Married}>Married</option>
+            <option value={RelationshipByType.Partner.Unmarried}>
               Unmarried
             </option>
-            <option value={RelationshipTypeIds.Partner.Separated}>
+            <option value={RelationshipByType.Partner.Separated}>
               Seperated
             </option>
           </select>
@@ -415,12 +415,10 @@ export function ParentModal({
           <div>
             This parent is the{" "}
             <select name="relationship" id="relationship-select">
-              <option value={RelationshipTypeIds.Parent.Biological}>
+              <option value={RelationshipByType.Parent.Biological}>
                 biological
               </option>
-              <option value={RelationshipTypeIds.Parent.Adopted}>
-                adopted
-              </option>
+              <option value={RelationshipByType.Parent.Adopted}>adopted</option>
             </select>{" "}
             parent of {node.first_name} {node.second_name}
           </div>
@@ -441,18 +439,18 @@ export function ParentModal({
             from: parents[0].id,
             to: parents[1].id,
             fd,
-            revalidatedPath: `/tree/${familyId}`
+            revalidatedPath: `/tree/${familyId}`,
           })
           onClose()
         }}
       >
         <label htmlFor="relationship-select">{`${parents[0].first_name} ${parents[0].second_name} and ${parents[1].first_name} ${parents[1].second_name} are: `}</label>
         <select name="relationship" id="relationship-select">
-          <option value={RelationshipTypeIds.Partner.Married}>Married</option>
-          <option value={RelationshipTypeIds.Partner.Unmarried}>
+          <option value={RelationshipByType.Partner.Married}>Married</option>
+          <option value={RelationshipByType.Partner.Unmarried}>
             Unmarried
           </option>
-          <option value={RelationshipTypeIds.Partner.Separated}>
+          <option value={RelationshipByType.Partner.Separated}>
             Seperated
           </option>
         </select>
