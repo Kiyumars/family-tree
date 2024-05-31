@@ -1,4 +1,4 @@
-import { RelationshipType } from "@/common.types"
+import { RelationshipType } from "@/types/common.types"
 
 export const ById: Record<number, RelationshipType> = {
   "1": {

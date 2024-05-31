@@ -3,7 +3,7 @@ import {
   Relationship,
   RelationshipType,
   RelationshipUpsert,
-} from "@/common.types"
+} from "@/types/common.types"
 import * as rtMap from "../../../constants/maps/RelationshipTypes"
 
 export interface Adjacencies {

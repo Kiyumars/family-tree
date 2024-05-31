@@ -1,11 +1,10 @@
 "use client"
 
-import { FamilyMember, Relationship, RelationshipType } from "@/common.types"
+import { FamilyMember } from "@/types/common.types"
 import * as React from "react"
 import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
-import { DataSet } from "vis-data"
-import MemberModal from "./MemberModal"
 import { Adjacencies } from "../../app/tree/utils/utils"
+import MemberModal from "./MemberModal"
 
 interface Props {
   familyId: number

@@ -1,4 +1,4 @@
-import { Relationship } from "@/common.types"
+import { Relationship } from "@/types/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
 import { createMembers } from "../../../stories/util"

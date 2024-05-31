@@ -5,7 +5,7 @@ import {
   upsertFamilyMember,
   upsertRelationship,
 } from "@/app/actions"
-import { FamilyMember } from "@/common.types"
+import { FamilyMember } from "@/types/common.types"
 import * as React from "react"
 import { Adjacencies } from "../../app/tree/utils/utils"
 import styles from "./MemberModal.module.css"
