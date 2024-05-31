@@ -7,9 +7,9 @@ import {
 } from "@/app/actions"
 import { FamilyMember } from "@/common.types"
 import * as React from "react"
-import { Adjacencies } from "../utils/utils"
+import { Adjacencies } from "../../app/tree/utils/utils"
 import styles from "./MemberModal.module.css"
-import ModalWrapper from "./ModalWrapper"
+import ModalWrapper from "../modal/ModalWrapper"
 import * as rtMap from "@/app/tree/utils/maps/RelationshipTypes"
 
 interface Props {

@@ -5,7 +5,7 @@ import * as React from "react"
 import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
 import { DataSet } from "vis-data"
 import MemberModal from "./MemberModal"
-import { Adjacencies } from "../utils/utils"
+import { Adjacencies } from "../../app/tree/utils/utils"
 
 interface Props {
   familyId: number

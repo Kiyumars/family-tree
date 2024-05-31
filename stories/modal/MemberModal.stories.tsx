@@ -1,8 +1,8 @@
 import MemberModal, {
   EditMode,
-  ReadMode
-} from "@/app/tree/components/MemberModal"
-import ModalWrapper from "@/app/tree/components/ModalWrapper"
+  ReadMode,
+} from "@/components/member/MemberModal"
+import ModalWrapper from "@/components/modal/ModalWrapper"
 import { Meta, StoryObj } from "@storybook/react"
 import { fakeMember } from "../util"
 
