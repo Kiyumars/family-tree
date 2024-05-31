@@ -67,9 +67,7 @@ ${c}
 function writeToFile(content: string) {
   const filePath = path.join(
     ".",
-    "app",
-    "tree",
-    "utils",
+    "constants",
     "maps",
     "RelationshipTypes.ts"
   )
