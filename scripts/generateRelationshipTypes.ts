@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 import * as dotenv from "dotenv"
 import * as fs from "fs"
-import { RelationshipType } from "./common.types"
+import { RelationshipType } from "../common.types"
 import path from "path"
 
 dotenv.config({ path: ".env.local" })
@@ -68,7 +68,7 @@ function writeToFile(content: string) {
   const filePath = path.join(
     ".",
     "app",
-    'tree',
+    "tree",
     "utils",
     "maps",
     "RelationshipTypes.ts"
