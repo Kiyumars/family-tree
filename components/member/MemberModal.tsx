@@ -7,7 +7,7 @@ import {
 } from "@/app/actions"
 import { FamilyMember } from "@/types/common.types"
 import * as React from "react"
-import { Adjacencies } from "../../app/tree/utils/utils"
+import { Adjacencies } from "@/utils/helpers/tree"
 import styles from "./MemberModal.module.css"
 import ModalWrapper from "../modal/ModalWrapper"
 import * as rtMap from "@/constants/maps/RelationshipTypes"

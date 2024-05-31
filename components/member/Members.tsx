@@ -3,7 +3,7 @@ import {
   mapAdjencies,
   mapFamilyMembers,
   setHierarchies,
-} from "../../app/tree/utils/utils"
+} from "@/utils/helpers/tree"
 import MembersGraph from "./MembersGraph"
 
 interface Props {

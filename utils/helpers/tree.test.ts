@@ -1,14 +1,14 @@
 import { Relationship } from "@/types/common.types"
 import { describe } from "node:test"
 import { expect, test } from "vitest"
-import { createMembers } from "../../../stories/util"
-import * as rtMap from "../../../constants/maps/RelationshipTypes"
+import { createMembers } from "../../stories/util"
+import * as rtMap from "../../constants/maps/RelationshipTypes"
 import {
   Adjacencies,
   createAdjaciencies,
   mapAdjencies,
   setHierarchies,
-} from "./utils"
+} from "./tree"
 
 describe("actions add level", () => {
   test("should return zero for standalone line", () => {

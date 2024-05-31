@@ -5,12 +5,12 @@ import {
   FamilyMemberUpsert,
   RelationshipUpsert,
 } from "@/types/common.types"
+import { addRecipricolRelationships } from "@/utils/helpers/tree"
 import { createClient } from "@/utils/supabase/server"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { revalidatePath } from "next/cache"
 import { notFound } from "next/navigation"
 import { z } from "zod"
-import { addRecipricolRelationships, findRecipricol } from "./tree/utils/utils"
 
 export async function fetchTreeData(familyId: number) {
   const client = createClient()

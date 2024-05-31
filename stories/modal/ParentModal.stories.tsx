@@ -1,6 +1,6 @@
 import MemberModal, { ParentModal } from "@/components/member/MemberModal"
 import ModalWrapper from "@/components/modal/ModalWrapper"
-import { Adjacencies, createAdjaciencies } from "@/app/tree/utils/utils"
+import { Adjacencies, createAdjaciencies } from "@/utils/helpers/tree"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers } from "../util"
 

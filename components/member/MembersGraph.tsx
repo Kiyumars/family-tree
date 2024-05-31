@@ -3,7 +3,7 @@
 import { FamilyMember } from "@/types/common.types"
 import * as React from "react"
 import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
-import { Adjacencies } from "../../app/tree/utils/utils"
+import { Adjacencies } from "@/utils/helpers/tree"
 import MemberModal from "./MemberModal"
 
 interface Props {
