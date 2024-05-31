@@ -5,12 +5,12 @@ import {
   upsertFamilyMember,
   upsertRelationship,
 } from "@/app/actions"
-import { FamilyMember } from "@/common.types"
+import { FamilyMember } from "@/types/common.types"
 import * as React from "react"
-import { Adjacencies } from "../utils/utils"
+import { Adjacencies } from "@/utils/helpers/tree"
 import styles from "./MemberModal.module.css"
-import ModalWrapper from "./ModalWrapper"
-import * as rtMap from "@/app/tree/utils/maps/RelationshipTypes"
+import ModalWrapper from "../modal/ModalWrapper"
+import * as rtMap from "@/constants/maps/RelationshipTypes"
 
 interface Props {
   onClose: () => void

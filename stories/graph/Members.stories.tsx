@@ -1,5 +1,5 @@
-import Members from "@/app/tree/components/Members"
-import { RelationshipType } from "@/common.types"
+import Members from "@/components/member/Members"
+import { RelationshipType } from "@/types/common.types"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers } from "../util"
 

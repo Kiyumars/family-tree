@@ -1,4 +1,4 @@
-import { FamilyMember, RelationshipType } from "@/common.types"
+import { FamilyMember } from "@/types/common.types"
 
 interface FakeMember {
   first_name: string

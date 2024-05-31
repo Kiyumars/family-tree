@@ -1,4 +1,4 @@
-import { Tables, TablesInsert } from "@/database.types"
+import { Tables, TablesInsert } from "@/types/database.types"
 
 export type FamilyMember = Tables<"family_members">
 export type FamilyMemberUpsert = TablesInsert<"family_members">

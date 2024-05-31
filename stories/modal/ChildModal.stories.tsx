@@ -1,6 +1,6 @@
-import MemberModal, { ChildMode } from "@/app/tree/components/MemberModal"
-import ModalWrapper from "@/app/tree/components/ModalWrapper"
-import { Adjacencies, createAdjaciencies } from "@/app/tree/utils/utils"
+import MemberModal, { ChildMode } from "@/components/member/MemberModal"
+import ModalWrapper from "@/components/modal/ModalWrapper"
+import { Adjacencies, createAdjaciencies } from "@/utils/helpers/tree"
 import { Meta, StoryObj } from "@storybook/react"
 import { createMembers } from "../util"
 

@@ -2,7 +2,7 @@ import { getSSRUser } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { fetchTreeData } from "../../actions"
-import Members from "../components/Members"
+import Members from "../../../components/member/Members"
 
 export default async function TreePage({ params }: { params: { id: number } }) {
   const user = await getSSRUser()
@@ -17,8 +17,7 @@ export default async function TreePage({ params }: { params: { id: number } }) {
 }
 
 async function Tree({ id }: { id: number }) {
-  const { membersRes, relationshipsRes } =
-    await fetchTreeData(id)
+  const { membersRes, relationshipsRes } = await fetchTreeData(id)
 
   return (
     <Members

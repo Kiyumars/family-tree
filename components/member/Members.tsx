@@ -1,9 +1,9 @@
-import { FamilyMember, Relationship } from "@/common.types"
+import { FamilyMember, Relationship } from "@/types/common.types"
 import {
   mapAdjencies,
   mapFamilyMembers,
   setHierarchies,
-} from "../utils/utils"
+} from "@/utils/helpers/tree"
 import MembersGraph from "./MembersGraph"
 
 interface Props {
