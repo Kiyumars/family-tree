@@ -48,7 +48,9 @@ export function ReadMode({
 }) {
   return (
     <div>
-      <h1 className={styles.title}>MemberModal</h1>
+      <h1
+        className={styles.title}
+      >{`${node.first_name} ${node.second_name}`}</h1>
       <div>
         <p>First name: {node.first_name}</p>
         <p>Second name: {node.second_name}</p>
@@ -102,7 +104,11 @@ export function EditMode({
   }
   return (
     <div>
-      <h1 className={styles.title}>MemberModal</h1>
+      <h1 className={styles.title}>
+        {node !== undefined
+          ? `${node.first_name} ${node.second_name}`
+          : "Add new member"}
+      </h1>
       <Form familyId={familyId} node={node} formAction={formAction} />
       <button onClick={onClose}>Close</button>
     </div>
