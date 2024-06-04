@@ -4,7 +4,8 @@ import { FamilyMember } from "@/types/common.types"
 import * as React from "react"
 import VisGraph, { Edge, Node } from "react-vis-graph-wrapper"
 import { Adjacencies } from "@/utils/helpers/tree"
-import MemberModal from "./MemberModal"
+import MemberModal, { EditMode } from "./MemberModal"
+import ModalWrapper from "../modal/ModalWrapper"
 
 interface Props {
   familyId: number
@@ -12,9 +13,10 @@ interface Props {
   nodes: Node[]
   edges: Edge[]
   adjacenciesMap: Record<number, Adjacencies>
+  selectedNode?: Node
 }
 
-export function MembersGraph({
+export default function MembersGraph({
   adjacenciesMap,
   nodes,
   edges,
@@ -80,4 +82,21 @@ export function MembersGraph({
   )
 }
 
-export default MembersGraph
+export function EmptyGraph({ familyId }: Pick<Props, "familyId">) {
+  const [addMember, setAddMember] = React.useState(false)
+  return (
+    <div>
+      <h1>Create the family tree!</h1>
+      <button onClick={() => setAddMember(true)}>Add family member</button>
+      {addMember && (
+        <ModalWrapper>
+          <EditMode
+            familyId={familyId}
+            onClose={() => setAddMember(false)}
+            onSubmit={() => setAddMember(false)}
+          />
+        </ModalWrapper>
+      )}
+    </div>
+  )
+}
