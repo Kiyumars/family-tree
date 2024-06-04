@@ -2,6 +2,7 @@ import { createClient, getSSRUser } from "@/utils/supabase/server"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
+import CreateFamily from "../create"
 
 export default async function Trees() {
   const user = await getSSRUser()
@@ -12,6 +13,7 @@ export default async function Trees() {
   return (
     <Suspense>
       <Content />
+      <CreateFamily />
     </Suspense>
   )
 }
