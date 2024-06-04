@@ -4,7 +4,7 @@ import {
   mapFamilyMembers,
   setHierarchies,
 } from "@/utils/helpers/tree"
-import MembersGraph from "./MembersGraph"
+import MembersGraph, { EmptyGraph } from "./MembersGraph"
 
 interface Props {
   familyId: number
@@ -18,11 +18,7 @@ export default function Members({
   relationships,
 }: Props) {
   if (!familyMembers.length) {
-    return (
-      <div>
-        <h1>Create your family tree!</h1>
-      </div>
-    )
+    return <EmptyGraph familyId={familyId} />
   }
 
   const fmMap = mapFamilyMembers(familyMembers)

@@ -84,12 +84,12 @@ export function EditMode({
   onSubmit,
 }: {
   familyId: number
-  node: FamilyMember
+  node?: FamilyMember
   onClose: () => void
   onSubmit: (node: FamilyMember) => void
 }) {
   const formAction = async (formData: FormData) => {
-    if (node.id) {
+    if (node?.id) {
       formData.append("id", node.id.toString())
     }
     formData.append("family_id", familyId.toString())
